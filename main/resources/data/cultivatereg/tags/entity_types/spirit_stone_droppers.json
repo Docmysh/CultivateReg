@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:zombie",
+    "minecraft:skeleton",
+    "minecraft:spider",
+    "minecraft:creeper",
+    "minecraft:witch",
+    "minecraft:enderman"
+  ]
+}

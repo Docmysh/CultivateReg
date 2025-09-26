@@ -1,0 +1,12 @@
+{
+  "type": "cultivatereg:add_spirit_stone",
+  "conditions": [
+    {
+      "condition": "minecraft:entity_properties",
+      "entity": "this",
+      "predicate": { "type": "#cultivatereg:spirit_stone_droppers" }
+    },
+    { "condition": "minecraft:random_chance_with_looting", "chance": 0.20, "looting_multiplier": 0.06 }
+  ],
+  "stack": { "id": "cultivatereg:spirit_stone", "Count": 1 }
+}
