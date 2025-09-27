@@ -169,8 +169,22 @@ public class MobCultivationEvents {
             realmScale = 1.0;
         } else if (realm == Realm.FOUNDATION) {
             realmScale = ModConfigs.COMMON.creeperFoundationRealmMult.get();
-        } else if (realm.isCoreTier()) {
-            realmScale = ModConfigs.COMMON.creeperCoreRealmMult.get();
+        } else if (realm.ordinal() >= Realm.CORE_FORMATION.ordinal()) {
+            double baseMult = ModConfigs.COMMON.creeperCoreRealmMult.get();
+            int extraRealms = Math.max(0, realm.ordinal() - Realm.CORE_FORMATION.ordinal());
+            if (extraRealms == 0) {
+                realmScale = baseMult;
+            } else {
+                double step = ModConfigs.COMMON.creeperAdvancedRealmStep.get();
+                realmScale = baseMult * Math.pow(step, extraRealms);
+            }
+
+            int advancedSteps = Math.max(0, realm.ordinal() - Realm.CORE_FORMATION.ordinal());
+            if (advancedSteps > 0) {
+                double step = ModConfigs.COMMON.creeperAdvancedRealmStep.get();
+                // Apply the configured growth once per realm past Core Formation.
+                realmScale *= Math.pow(step, advancedSteps);
+            }
         } else {
             realmScale = 1.0;
         }
