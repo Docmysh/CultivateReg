@@ -6,7 +6,11 @@
       "entity": "this",
       "predicate": { "type": "#cultivatereg:spirit_stone_droppers" }
     },
-    { "condition": "minecraft:random_chance_with_looting", "chance": 0.20, "looting_multiplier": 0.06 }
+    { "condition": "minecraft:killed_by_player" }
   ],
-  "stack": { "id": "cultivatereg:spirit_stone", "Count": 1 }
+  "low": { "item": "cultivatereg:low_spirit_stone", "count": 1 },
+  "mid": { "item": "cultivatereg:spirit_stone", "count": 1 },
+  "high": { "item": "cultivatereg:high_spirit_stone", "count": 1 },
+  "top": { "item": "cultivatereg:top_spirit_stone", "count": 1 },
+  "core_top_chance": 0.05
 }

@@ -18,12 +18,12 @@ public record StopRestPacket() {
             if (sender == null) return;
 
             sender.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent((CultivationData data) -> {
+                if (!data.isResting()) return;
+
                 data.setResting(false);
 
-                if (sender.getVehicle() instanceof com.bo.cultivatereg.entity.SeatEntity seat) {
-                    sender.stopRiding();
-                    seat.discard();
-                }
+                // No more seat entity to remove.
+
                 Net.sync(sender, data);
             });
         });

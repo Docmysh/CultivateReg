@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import java.util.Arrays;
 
 @Mod.EventBusSubscriber(modid = CultivateReg.MODID)
 public class CultivationCommands {
@@ -77,7 +78,8 @@ public class CultivationCommands {
                                     data.setSenseProgress(0f);
                                     Net.sync(sp, data);
                                 } catch (IllegalArgumentException ex) {
-                                    msg(ctx.getSource(), "Unknown realm. Use: MORTAL, QI_GATHERING, FOUNDATION, CORE_FORMATION");
+                                    String valid = String.join(", ", Arrays.stream(Realm.values()).map(Enum::name).toList());
+                                    msg(ctx.getSource(), "Unknown realm. Use: %s", valid);
                                 }
                             });
                             return 1;

@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "uuid": "c3af8a4d-7a40-4e4e-9f98-1a7f3cf4a6a1",
+  "name": "meditation",
+  "emote": {
+    "beginTick": 0,
+    "endTick": 20,
+    "stopTick": 20,
+    "isLoop": true,
+    "returnTick": 0,
+    "nsfw": false,
+    "degrees": true,
+    "moves": [
+      {
+        "tick": 0,
+        "easing": "INOUTSINE",
+        "body":    { "pitch": 10.0, "yaw": 0.0,  "roll": 0.0 },
+        "rightLeg":{ "pitch": -90.0, "yaw": -35.0, "roll":  25.0 },
+        "leftLeg": { "pitch": -90.0, "yaw":  35.0, "roll": -25.0 },
+        "rightArm":{ "pitch": -25.0, "yaw":  15.0, "roll":  15.0 },
+        "leftArm": { "pitch": -25.0, "yaw": -15.0, "roll": -15.0 }
+      },
+      {
+        "tick": 20,
+        "easing": "LINEAR",
+        "body":    { "pitch": 10.0, "yaw": 0.0,  "roll": 0.0 },
+        "rightLeg":{ "pitch": -90.0, "yaw": -35.0, "roll":  25.0 },
+        "leftLeg": { "pitch": -90.0, "yaw":  35.0, "roll": -25.0 },
+        "rightArm":{ "pitch": -25.0, "yaw":  15.0, "roll":  15.0 },
+        "leftArm": { "pitch": -25.0, "yaw": -15.0, "roll": -15.0 }
+      }
+    ]
+  }
+}

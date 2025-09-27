@@ -47,6 +47,10 @@ public interface CultivationData {
         return n;
     }
 
+    default float getMeridianBonusMultiplier() {
+        return 1.0f + 0.04f * getOpenMeridianCount();
+    }
+
 
 
 

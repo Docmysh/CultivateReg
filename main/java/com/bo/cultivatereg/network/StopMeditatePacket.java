@@ -29,11 +29,7 @@ public record StopMeditatePacket() {
                 // stop meditating
                 data.setMeditating(false);
 
-                // if we're sitting on our invisible seat entity, dismount and remove it
-                if (sender.getVehicle() instanceof com.bo.cultivatereg.entity.SeatEntity seat) {
-                    sender.stopRiding();
-                    seat.discard(); // server side: remove the seat entity
-                }
+                // No more seat entity to remove.
 
                 // sync new state to the client
                 Net.sync(sender, data);

@@ -19,6 +19,12 @@ public class ModConfigs {
         public final ForgeConfigSpec.IntValue qiGatheringWeight;
         public final ForgeConfigSpec.IntValue foundationWeight;
         public final ForgeConfigSpec.IntValue coreWeight;
+        public final ForgeConfigSpec.IntValue nascentSoulWeight;
+        public final ForgeConfigSpec.IntValue soulTransformationWeight;
+        public final ForgeConfigSpec.IntValue spiritSeveringWeight;
+        public final ForgeConfigSpec.IntValue voidRefiningWeight;
+        public final ForgeConfigSpec.IntValue integrationWeight;
+        public final ForgeConfigSpec.IntValue tribulationWeight;
 
         // --- Attribute scaling (multipliers on base attributes) ---
         public final ForgeConfigSpec.DoubleValue qiHealthBase;
@@ -65,6 +71,7 @@ public class ModConfigs {
         public final ForgeConfigSpec.DoubleValue creeperPerStageAddMult;
         public final ForgeConfigSpec.DoubleValue creeperFoundationRealmMult;
         public final ForgeConfigSpec.DoubleValue creeperCoreRealmMult;
+        public final ForgeConfigSpec.DoubleValue creeperAdvancedRealmStep;
 
         public Common(ForgeConfigSpec.Builder b) {
             b.push("cultivation_mobs");
@@ -73,6 +80,12 @@ public class ModConfigs {
             qiGatheringWeight = b.defineInRange("qiGatheringWeight", 80, 0, 1000);
             foundationWeight  = b.defineInRange("foundationWeight", 18, 0, 1000);
             coreWeight        = b.defineInRange("coreWeight", 2,  0, 1000);
+            nascentSoulWeight = b.defineInRange("nascentSoulWeight", 1, 0, 1000);
+            soulTransformationWeight = b.defineInRange("soulTransformationWeight", 1, 0, 1000);
+            spiritSeveringWeight = b.defineInRange("spiritSeveringWeight", 1, 0, 1000);
+            voidRefiningWeight = b.defineInRange("voidRefiningWeight", 1, 0, 1000);
+            integrationWeight = b.defineInRange("integrationWeight", 1, 0, 1000);
+            tribulationWeight = b.defineInRange("tribulationWeight", 1, 0, 1000);
             b.pop();
 
             b.push("attributes_health");
@@ -103,6 +116,8 @@ public class ModConfigs {
             creeperPerStageAddMult     = b.defineInRange("creeperPerStageAddMult",      1.0d, 0d, 100d);
             creeperFoundationRealmMult = b.defineInRange("creeperFoundationRealmMult", 10.0d, 0d, 100d);
             creeperCoreRealmMult       = b.defineInRange("creeperCoreRealmMult",       20.0d, 0d, 100d);
+            creeperAdvancedRealmStep   = b.comment("Multiplier applied per realm above Core Formation")
+                    .defineInRange("creeperAdvancedRealmStep", 1.5d, 1.0d, 100d);
             b.pop();
 
             b.push("heavenly_sword");

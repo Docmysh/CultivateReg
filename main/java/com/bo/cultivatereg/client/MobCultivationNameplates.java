@@ -89,21 +89,12 @@ public class MobCultivationNameplates {
 
     // Helpers: display + colors
     private static String shortRealm(Realm r) {
-        return switch (r) {
-            case MORTAL -> "Mortal";
-            case QI_GATHERING -> "Qi Gather";
-            case FOUNDATION -> "Foundation";
-            case CORE_FORMATION -> "Core Form";
-        };
+        return r.shortName();
     }
 
     private static int realmColor(Realm r) {
         // ARGB
-        return switch (r) {
-            case MORTAL -> 0xFFC0C0C0;        // grey
-            case QI_GATHERING -> 0xFF4FC3F7;  // cyan
-            case FOUNDATION -> 0xFFB388FF;    // violet
-            case CORE_FORMATION -> 0xFFFFD54F;// gold
+        return r.nameplateColor();
         };
     }
-}
+

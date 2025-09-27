@@ -30,7 +30,7 @@ public record SenseAttemptPacket(int meridianIndex) {
                 if (d.isMeridianOpen(idx)) return;
 
                 // === Attempt cost ===
-                final var SPIRIT_STONE_ID = ResourceLocation.fromNamespaceAndPath("cultivatereg", "spirit_stone");
+                final var SPIRIT_STONE_ID = ResourceLocation.fromNamespaceAndPath("cultivatereg", "low_spirit_stone");
 
                 if (d.getRealm() == Realm.MORTAL) {
                     // Mortal: must use a Spirit Stone per attempt

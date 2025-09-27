@@ -71,6 +71,12 @@ public class ServerEvents {
             boolean dirty = false, bigChange = false;
             boolean oncePerSecond = (p.level().getGameTime() % 20L) == 0L;
 
+            // --- NEW: Immobilize player when meditating or resting ---
+            if (data.isMeditating() || data.isResting()) {
+                p.setDeltaMovement(0, p.getDeltaMovement().y, 0); // Stop horizontal movement
+                p.hurtMarked = true; // Helps prevent knockback
+            }
+
             // --- Realm gating: ONLY flight is gated to Foundation+ ---
             if (data.getRealm().ordinal() < Realm.FOUNDATION.ordinal()) {
                 if (data.isFlying()) {
@@ -100,10 +106,9 @@ public class ServerEvents {
 
             // --- MEDITATING (breakthrough Qi only) ---
             if (data.isMeditating()) {
-                p.setDeltaMovement(0, p.getDeltaMovement().y, 0);
-                p.hurtMarked = true;
                 if (data.hasSensed() && data.getRealm() != Realm.MORTAL) {
-                    float rate = data.getRealm().baseRate * data.getRealm().rateMultiplierForStage(data.getStage());
+                    float rate = data.getRealm().baseRate * data.getRealm().rateMultiplierForStage(data.getStage())
+                            * Math.max(0f, data.getMeridianBonusMultiplier());
                     data.addQi(rate);
                     dirty = true;
                     boolean progressed = false;
@@ -232,29 +237,13 @@ public class ServerEvents {
 
     // ---------- helpers ----------
     private static int spiritCap(Realm realm, int stage) {
-        stage = Math.max(1, Math.min(9, stage));
-        return switch (realm) {
-            case MORTAL -> 0;
-            case QI_GATHERING -> 100 + 15 * (stage - 1);
-            case FOUNDATION   -> 200 + 25 * (stage - 1);
-            case CORE_FORMATION -> 400 + 50 * (stage - 1);
-        };
+        return realm.spiritCapForStage(stage);
     }
     private static float spiritRegenPerSecond(Realm realm) {
-        return switch (realm) {
-            case MORTAL -> 0f;
-            case QI_GATHERING -> 0.05f;
-            case FOUNDATION   -> 0.06f;
-            case CORE_FORMATION -> 0.08f;
-        };
+        return realm.spiritRegenPerSecond();
     }
     private static float healthRegenPerSecond(Realm realm) {
-        return switch (realm) {
-            case MORTAL -> 0.5f;
-            case QI_GATHERING -> 0.8f;
-            case FOUNDATION   -> 1.2f;
-            case CORE_FORMATION -> 1.6f;
-        };
+        return realm.healthRegenPerSecond();
     }
     // --- Shield scaling math ---
     private static float computeShieldReduction(Realm defRealm, int defStage, Realm atkRealm, int atkStage) {

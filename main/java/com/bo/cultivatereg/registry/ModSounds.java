@@ -13,9 +13,9 @@ public class ModSounds {
 
     public static final RegistryObject<SoundEvent> HEAVENLY_SWORD_WARBLE =
             SOUND_EVENTS.register("heavenly_sword_warble",
-                    () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(CultivateReg.MODID, "heavenly_sword_warble")));
+                    () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(CultivateReg.MODID, "heavenly_sword_warble")));
 
     public static final RegistryObject<SoundEvent> HEAVENLY_SWORD_SLICE =
             SOUND_EVENTS.register("heavenly_sword_slice",
-                    () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(CultivateReg.MODID, "heavenly_sword_slice")));
+                    () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(CultivateReg.MODID, "heavenly_sword_slice")));
 }

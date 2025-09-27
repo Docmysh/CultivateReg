@@ -11,7 +11,6 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
-
 public class Net {
     private static final String PROTO = "6";
     public static SimpleChannel CHANNEL;
@@ -19,55 +18,44 @@ public class Net {
     /** Call this once during common setup (you likely already do). */
     public static void init() {
         CHANNEL = NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(CultivateReg.MODID, "main"))
+                .named(ResourceLocation.fromNamespaceAndPath(CultivateReg.MODID, "main")) // FIX: Deprecation
                 .networkProtocolVersion(() -> PROTO)
                 .clientAcceptedVersions(PROTO::equals)
                 .serverAcceptedVersions(PROTO::equals)
                 .simpleChannel();
 
         int id = 0;
-
         // Core sync
         CHANNEL.registerMessage(id++, SyncCultivationPacket.class,
                 SyncCultivationPacket::encode, SyncCultivationPacket::decode, SyncCultivationPacket::handle);
-
         CHANNEL.registerMessage(id++, SyncMobCultivationPacket.class,
                 SyncMobCultivationPacket::encode, SyncMobCultivationPacket::decode, SyncMobCultivationPacket::handle);
-
         // Meditation / states
         CHANNEL.registerMessage(id++, StartMeditatePacket.class,
                 StartMeditatePacket::encode, StartMeditatePacket::decode, StartMeditatePacket::handle);
         CHANNEL.registerMessage(id++, StopMeditatePacket.class,
                 StopMeditatePacket::encode, StopMeditatePacket::decode, StopMeditatePacket::handle);
-
         CHANNEL.registerMessage(id++, StartRestPacket.class,
                 StartRestPacket::encode, StartRestPacket::decode, StartRestPacket::handle);
         CHANNEL.registerMessage(id++, StopRestPacket.class,
                 StopRestPacket::encode, StopRestPacket::decode, StopRestPacket::handle);
-
         CHANNEL.registerMessage(id++, StartShieldPacket.class,
                 StartShieldPacket::encode, StartShieldPacket::decode, StartShieldPacket::handle);
         CHANNEL.registerMessage(id++, StopShieldPacket.class,
                 StopShieldPacket::encode, StopShieldPacket::decode, StopShieldPacket::handle);
-
         CHANNEL.registerMessage(id++, StartQiSightPacket.class,
                 StartQiSightPacket::encode, StartQiSightPacket::decode, StartQiSightPacket::handle);
         CHANNEL.registerMessage(id++, StopQiSightPacket.class,
                 StopQiSightPacket::encode, StopQiSightPacket::decode, StopQiSightPacket::handle);
-
         CHANNEL.registerMessage(id++, StartFlightPacket.class,
                 StartFlightPacket::encode, StartFlightPacket::decode, StartFlightPacket::handle);
         CHANNEL.registerMessage(id++, StopFlightPacket.class,
                 StopFlightPacket::encode, StopFlightPacket::decode, StopFlightPacket::handle);
-
         // Early-game sensing -> guide Qi to meridian
         CHANNEL.registerMessage(id++, SenseAttemptPacket.class,
                 SenseAttemptPacket::encode, SenseAttemptPacket::decode, SenseAttemptPacket::handle);
         CHANNEL.registerMessage(id++, BreakthroughPacket.class,
                 BreakthroughPacket::encode, BreakthroughPacket::decode, BreakthroughPacket::handle);
-
-
-        // NOTE: Heavenly Sword packets intentionally not registered anymore.
     }
 
     /** Player cultivation sync (now includes meridian mask + progress). */
@@ -96,7 +84,6 @@ public class Net {
                 )
         );
     }
-
 
     public static void syncMobToPlayer(ServerPlayer sp, LivingEntity le, MobCultivationData data) {
         CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp),

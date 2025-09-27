@@ -38,16 +38,43 @@ public class MobCultivationEvents {
                 // Config-driven chance & weights
                 double chance = ModConfigs.COMMON.cultivatedSpawnChance.get();
                 if (r.nextDouble() < chance) {
-                    int wQi   = ModConfigs.COMMON.qiGatheringWeight.get();
-                    int wFou  = ModConfigs.COMMON.foundationWeight.get();
-                    int wCore = ModConfigs.COMMON.coreWeight.get();
-                    int total = Math.max(1, wQi + wFou + wCore);
-                    int pick  = r.nextInt(total);
+                    int[] weights = new int[]{
+                            ModConfigs.COMMON.qiGatheringWeight.get(),
+                            ModConfigs.COMMON.foundationWeight.get(),
+                            ModConfigs.COMMON.coreWeight.get(),
+                            ModConfigs.COMMON.nascentSoulWeight.get(),
+                            ModConfigs.COMMON.soulTransformationWeight.get(),
+                            ModConfigs.COMMON.spiritSeveringWeight.get(),
+                            ModConfigs.COMMON.voidRefiningWeight.get(),
+                            ModConfigs.COMMON.integrationWeight.get(),
+                            ModConfigs.COMMON.tribulationWeight.get()
+                    };
+                    Realm[] realms = new Realm[]{
+                            Realm.QI_GATHERING,
+                            Realm.FOUNDATION,
+                            Realm.CORE_FORMATION,
+                            Realm.NASCENT_SOUL,
+                            Realm.SOUL_TRANSFORMATION,
+                            Realm.SPIRIT_SEVERING,
+                            Realm.VOID_REFINING,
+                            Realm.INTEGRATION,
+                            Realm.TRIBULATION
+                    };
 
-                    Realm realm;
-                    if ((pick -= wQi) < 0) realm = Realm.QI_GATHERING;
-                    else if ((pick -= wFou) < 0) realm = Realm.FOUNDATION;
-                    else realm = Realm.CORE_FORMATION;
+                    int total = 0;
+                    for (int w : weights) total += Math.max(0, w);
+
+                    Realm realm = Realm.QI_GATHERING;
+                    if (total > 0) {
+                        int pick = r.nextInt(total);
+                        for (int i = 0; i < weights.length; i++) {
+                            pick -= Math.max(0, weights[i]);
+                            if (pick < 0) {
+                                realm = realms[i];
+                                break;
+                            }
+                        }
+                    }
 
                     int stage = 1 + r.nextInt(9);
                     data.setHasCultivation(true);
@@ -76,14 +103,16 @@ public class MobCultivationEvents {
                             c.goalSelector.removeGoal(g);
                         }
                     }
-                    double accel = 0.08; // snappy hover
-                    double maxSpd = (data.getRealm() == Realm.CORE_FORMATION) ? 0.60 : 0.45;
-                    c.goalSelector.addGoal(1, new QiFlightCreeperGoal(c, accel, maxSpd));
+                    int tier = Math.max(0, data.getRealm().ordinal() - Realm.FOUNDATION.ordinal());
+                    double accel = 0.05 + 0.03 * tier;
+                    double maxSpd = 0.45 + 0.15 * tier;
+                    c.goalSelector.addGoal(1, new QiFlightCreeperGoal(c, Math.min(accel, 0.20), Math.min(maxSpd, 1.50)));
                 } else if (le instanceof PathfinderMob pm) {
                     // General flying melee pursuit for other mobs (zombie, etc.)
-                    double accel = (data.getRealm() == Realm.CORE_FORMATION) ? 0.08 : 0.05;
-                    double maxSpd = (data.getRealm() == Realm.CORE_FORMATION) ? 0.60 : 0.45;
-                    int atkCD     = (data.getRealm() == Realm.CORE_FORMATION) ? 14   : 18;
+                    boolean advanced = data.getRealm().isCoreTier();
+                    double accel = advanced ? 0.08 : 0.05;
+                    double maxSpd = advanced ? 0.60 : 0.45;
+                    int atkCD     = advanced ? 14   : 18;
                     pm.goalSelector.addGoal(2, new QiFlightMeleeGoal(pm, accel, maxSpd, atkCD));
                 }
 
@@ -130,16 +159,21 @@ public class MobCultivationEvents {
         double base = ModConfigs.COMMON.creeperBaseRadius.get(); // vanilla ~3.0
         if (!data.hasCultivation()) return (float) base;
 
-        // Qi: base x5 +1 per stage, Foundation: x10, Core: x20 (all config-driven)
+        // Qi: base x5 +1 per stage. Foundation & above use configured multipliers that scale further for later realms.
         double qiScale = ModConfigs.COMMON.creeperQiBaseMult.get()
                 + ModConfigs.COMMON.creeperPerStageAddMult.get() * (data.getStage() - 1);
 
-        double realmScale = switch (data.getRealm()) {
-            case QI_GATHERING   -> 1.0;
-            case FOUNDATION     -> ModConfigs.COMMON.creeperFoundationRealmMult.get();
-            case CORE_FORMATION -> ModConfigs.COMMON.creeperCoreRealmMult.get();
-            default             -> 1.0;
-        };
+        double realmScale;
+        Realm realm = data.getRealm();
+        if (realm == Realm.QI_GATHERING) {
+            realmScale = 1.0;
+        } else if (realm == Realm.FOUNDATION) {
+            realmScale = ModConfigs.COMMON.creeperFoundationRealmMult.get();
+        } else if (realm.isCoreTier()) {
+            realmScale = ModConfigs.COMMON.creeperCoreRealmMult.get();
+        } else {
+            realmScale = 1.0;
+        }
 
         return (float) (base * qiScale * realmScale);
     }
@@ -151,5 +185,23 @@ public class MobCultivationEvents {
         if (!(e.getTarget() instanceof LivingEntity le)) return;
         le.getCapability(MobCultivationCapability.CAP).ifPresent(data ->
                 Net.syncMobToPlayer(sp, le, data));
+    }
+
+    private static double realmAccel(Realm realm) {
+        if (realm.ordinal() >= Realm.NASCENT_SOUL.ordinal()) return 0.12;
+        if (realm.ordinal() >= Realm.CORE_FORMATION.ordinal()) return 0.08;
+        return 0.05;
+    }
+
+    private static double realmSpeed(Realm realm) {
+        if (realm.ordinal() >= Realm.NASCENT_SOUL.ordinal()) return 0.85;
+        if (realm.ordinal() >= Realm.CORE_FORMATION.ordinal()) return 0.60;
+        return 0.45;
+    }
+
+    private static int realmAttackCooldown(Realm realm) {
+        if (realm.ordinal() >= Realm.NASCENT_SOUL.ordinal()) return 10;
+        if (realm.ordinal() >= Realm.CORE_FORMATION.ordinal()) return 14;
+        return 18;
     }
 }

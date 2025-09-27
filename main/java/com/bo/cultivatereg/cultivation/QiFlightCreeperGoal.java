@@ -141,12 +141,17 @@ public class QiFlightCreeperGoal extends Goal {
 
         double qiScaled = qiBase + perStage * Math.max(0, stage - 1);
 
-        double mult = switch (cap.getRealm()) {
-            case MORTAL -> 1.0;
-            case QI_GATHERING -> qiScaled;
-            case FOUNDATION -> qiScaled * foundMul;
-            case CORE_FORMATION -> qiScaled * coreMul;
-        };
+        double mult;
+        Realm realm = cap.getRealm();
+        if (realm == Realm.MORTAL) {
+            mult = 1.0;
+        } else if (realm == Realm.QI_GATHERING) {
+            mult = qiScaled;
+        } else if (realm == Realm.FOUNDATION) {
+            mult = qiScaled * foundMul;
+        } else {
+            mult = qiScaled * coreMul;
+        }
 
         double radius = Math.max(1.0, Math.min(256.0, base * mult));
         return (float) radius;

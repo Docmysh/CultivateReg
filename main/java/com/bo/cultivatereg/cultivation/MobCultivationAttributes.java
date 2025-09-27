@@ -16,34 +16,18 @@ public final class MobCultivationAttributes {
     private MobCultivationAttributes() {}
 
     public static void apply(LivingEntity le, MobCultivationData data) {
-        double mult = computePowerMultiplier(data.getRealm(), data.getStage()); // health & damage
+        double mult = data.getRealm().mobPowerMultiplier(data.getStage()); // health & damage
         applyMul(le, Attributes.MAX_HEALTH,     MAX_HEALTH_MOD,    mult);
         applyMul(le, Attributes.ATTACK_DAMAGE,  ATTACK_DAMAGE_MOD, mult);
 
         double spdMult = 1.0 + (mult - 1.0) * 0.30; // speed increases less than raw power
         applyMul(le, Attributes.MOVEMENT_SPEED, MOVE_SPEED_MOD, spdMult);
 
-        double extraArmor = switch (data.getRealm()) {
-            case MORTAL -> 0.0;
-            case QI_GATHERING -> 2.0 + (data.getStage() - 1) * 0.2;
-            case FOUNDATION -> 6.0 + (data.getStage() - 1) * 0.4;
-            case CORE_FORMATION -> 12.0 + (data.getStage() - 1) * 0.6;
-        };
+        double extraArmor = data.getRealm().mobArmorBonus(data.getStage());
         applyAdd(le, Attributes.ARMOR, ARMOR_MOD, extraArmor);
 
         AttributeInstance hp = le.getAttribute(Attributes.MAX_HEALTH);
         if (hp != null) le.setHealth((float) hp.getValue());
-    }
-
-    private static double computePowerMultiplier(Realm realm, int stage) {
-        double base = switch (realm) {
-            case MORTAL -> 1.00;
-            case QI_GATHERING -> 1.20;
-            case FOUNDATION -> 1.80;
-            case CORE_FORMATION -> 3.00;
-        };
-        double perStage = 0.05 * Math.max(0, stage - 1);
-        return base * (1.0 + perStage);
     }
 
     private static void applyMul(LivingEntity le, net.minecraft.world.entity.ai.attributes.Attribute attr, UUID id, double multiplier) {

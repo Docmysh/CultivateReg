@@ -17,19 +17,13 @@ public record StartMeditatePacket() {
             var sender = c.getSender();
             if (sender == null) return;
             sender.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent((CultivationData data) -> {
+                // Cannot meditate while using other abilities
                 if (data.isShielding() || data.isFlying()) return;
+
                 if (!data.isMeditating()) {
                     data.setMeditating(true);
-                    var level = sender.level();
-                    if (!level.isClientSide) {
-                        var type = com.bo.cultivatereg.registry.ModEntities.SEAT.get();
-                        var seat = type.create(level);
-                        if (seat != null) {
-                            seat.moveTo(sender.getX(), Math.floor(sender.getY()), sender.getZ(), sender.getYRot(), sender.getXRot());
-                            level.addFreshEntity(seat);
-                            sender.startRiding(seat, true);
-                        }
-                    }
+                    // The server-side tick handler will now immobilize the player.
+                    // No more seat entity is needed.
                     Net.sync(sender, data);
                 }
             });

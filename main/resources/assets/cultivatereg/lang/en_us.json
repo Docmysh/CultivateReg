@@ -4,7 +4,10 @@
   "key.cultivatereg.meridians": "Meridians",
 
   "key.cultivatereg.qi_sight": "Toggle Qi Sight",
-  "item.cultivatereg.spirit_stone": "Spirit Stone"
+  "item.cultivatereg.low_spirit_stone": "Low-Grade Spirit Stone",
+  "item.cultivatereg.spirit_stone": "Mid-Grade Spirit Stone",
+  "item.cultivatereg.high_spirit_stone": "High-Grade Spirit Stone",
+  "item.cultivatereg.top_spirit_stone": "Top-Grade Spirit Stone"
 
 
 }

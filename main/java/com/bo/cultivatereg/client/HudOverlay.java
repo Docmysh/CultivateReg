@@ -24,13 +24,16 @@ public class HudOverlay {
             String qiLine;
             String actionLine;
 
+            // Updated logic for the "Mortal" stage display
             if (data.getRealm() == Realm.MORTAL && !data.hasSensed()) {
                 realmLine = "Realm: MORTAL";
-                qiLine = String.format("Sense: %.0f / 100", data.getSenseProgress());
+                // Changed "Sense" to "Breakthrough Progress"
+                qiLine = String.format("Breakthrough: %d/12 Meridians", data.getOpenMeridianCount());
                 long ticks = mc.player.tickCount;
                 int phase = (int)(ticks % 20L);
                 String beat = (phase < 4) ? "●" : "○";
-                actionLine = (data.isMeditating() ? "Tap C + tap V to open meridians " : "Hold C to start sensing ") + beat;
+                // Updated instructions to be more accurate
+                actionLine = (data.isMeditating() ? "Press V to open Meridians " : "Hold C to Meditate ") + beat;
             } else {
                 String stageStr = (data.getRealm() == Realm.MORTAL) ? "" : (" " + data.getStage() + "/9");
                 int cap = (data.getRealm() == Realm.MORTAL) ? 0 : data.getRealm().capForStage(data.getStage());
@@ -50,8 +53,11 @@ public class HudOverlay {
             draw(g, mc, qiLine,    x, y+10,  0xA0FFE0);
             draw(g, mc, actionLine,x, y+20,  0xFFD080);
 
-            // --- NEW: Spirit (mana) bar above the hunger bar ---
+            // Spirit bar rendering remains the same
             drawSpiritBar(g, mc, data, w, h);
+
+            // Replace massive heart stacks with a numeric health readout.
+            drawHealthNumbers(g, mc, w, h);
         });
     };
 
@@ -95,13 +101,33 @@ public class HudOverlay {
     }
 
     private static int spiritCap(Realm realm, int stage) {
-        stage = Mth.clamp(stage, 1, 9);
-        return switch (realm) {
-            case MORTAL -> 0;
-            case QI_GATHERING -> 100 + 15 * (stage - 1);     // 100..220
-            case FOUNDATION   -> 200 + 25 * (stage - 1);     // 200..400
-            case CORE_FORMATION -> 400 + 50 * (stage - 1);   // 400..800
-        };
+        return realm.spiritCapForStage(stage);
+    }
+
+    private static void drawHealthNumbers(GuiGraphics g, Minecraft mc, int w, int h) {
+        var player = mc.player;
+        if (player == null) return;
+
+        int x = (w / 2) - 91; // same anchor as vanilla hearts
+        int y = h - 39;
+
+        int health = Mth.ceil(player.getHealth());
+        int max = Mth.ceil(player.getMaxHealth());
+        int absorption = Mth.ceil(player.getAbsorptionAmount());
+
+        String hp = "HP: " + health + " / " + max;
+        if (absorption > 0) {
+            hp += " (+" + absorption + ")";
+        }
+
+        int color = 0xFFE57373; // default warm red
+        if (max > 0) {
+            float pct = health / (float) max;
+            if (pct >= 0.66f) color = 0xFFA5D6A7; // green
+            else if (pct >= 0.33f) color = 0xFFFFF59D; // yellow
+        }
+
+        g.drawString(mc.font, hp, x, y, color, true);
     }
 
     // ---------- Helpers ----------

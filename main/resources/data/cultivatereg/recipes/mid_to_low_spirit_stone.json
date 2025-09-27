@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "cultivatereg:spirit_stone" }
+  ],
+  "result": { "item": "cultivatereg:low_spirit_stone", "count": 9 }
+}

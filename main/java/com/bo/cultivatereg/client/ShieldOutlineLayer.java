@@ -60,12 +60,7 @@ public class ShieldOutlineLayer extends RenderLayer<AbstractClientPlayer, Player
     }
 
     private static float[] qiColorFor(Realm realm, int stage) {
-        // Simple palette by realm; keep within [0,1].
-        return switch (realm) {
-            case MORTAL        -> new float[]{0.60f, 0.60f, 0.60f};           // grey
-            case QI_GATHERING  -> new float[]{0.30f, 0.85f, 1.00f};           // cyan
-            case FOUNDATION    -> new float[]{0.70f, 0.40f, 1.00f};           // violet
-            case CORE_FORMATION-> new float[]{1.00f, 0.85f, 0.20f};           // gold
-        };
+        // Palette is defined on the realm itself so new realms automatically gain colours.
+        return realm.shieldColor();
     }
 }

@@ -1,11 +1,8 @@
-// src/main/java/com/bo/cultivatereg/client/ClientEvents.java
 package com.bo.cultivatereg.client;
 
 import com.bo.cultivatereg.CultivateReg;
 import com.bo.cultivatereg.cultivation.CultivationCapability;
-import com.bo.cultivatereg.cultivation.CultivationData;
 import com.bo.cultivatereg.network.Net;
-import com.bo.cultivatereg.network.SenseAttemptPacket;
 import com.bo.cultivatereg.network.StartFlightPacket;
 import com.bo.cultivatereg.network.StartMeditatePacket;
 import com.bo.cultivatereg.network.StartRestPacket;
@@ -14,127 +11,151 @@ import com.bo.cultivatereg.network.StopFlightPacket;
 import com.bo.cultivatereg.network.StopMeditatePacket;
 import com.bo.cultivatereg.network.StopRestPacket;
 import com.bo.cultivatereg.network.StopShieldPacket;
+import dev.kosmx.playerAnim.api.layered.IAnimation;
+import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
+import dev.kosmx.playerAnim.api.layered.ModifierLayer;
+import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
+import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
 
-@Mod.EventBusSubscriber(modid = CultivateReg.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = CultivateReg.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientEvents {
-    private static boolean prevC = false;
-    private static boolean prevSense = false;
+
+    private static boolean prevMeditate = false;
+    private static boolean prevMeridians = false;
     private static boolean prevRest = false;
     private static boolean prevShield = false;
     private static boolean prevFlight = false;
     private static boolean prevQiSight = false;
-    private static boolean prevHeaven = false; // track Heavenly Sword key state
-
-    // when R was pressed to start charging (client-side ticks)
-    private static int chargeStartClientTicks = -1;
 
     @SubscribeEvent
-    public static void clientTick(TickEvent.ClientTickEvent e) {
+    public static void onClientTick(TickEvent.ClientTickEvent e) {
         if (e.phase != TickEvent.Phase.END) return;
-        var mc = Minecraft.getInstance();
-        if (mc.player == null || Keybinds.MEDITATE_KEY == null) return;
+        Minecraft mc = Minecraft.getInstance();
+        LocalPlayer player = mc.player;
+        if (player == null) return;
 
+        // NEW: Cancel meditation/resting if the player moves.
+        handleMovementCancellation(player);
 
+        handleAnimation(player);
+        handleKeybinds(player);
+    }
 
-        // --- Qi Sight toggle (client-only) ---
-        if (Keybinds.QI_SIGHT_KEY != null) {
-            boolean now = Keybinds.QI_SIGHT_KEY.isDown();
-            if (now && !prevQiSight) {
-                boolean on = ClientState.toggleQiSight();
-                mc.player.displayClientMessage(Component.literal(on ? "Qi Sight: ON" : "Qi Sight: OFF"), true);
-            }
-            prevQiSight = now;
-        }
-
-        // --- Shield toggle ---
-        if (Keybinds.SHIELD_KEY != null) {
-            boolean now = Keybinds.SHIELD_KEY.isDown();
-            if (now && !prevShield) {
-                mc.player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(d -> {
-                    if (d.isShielding()) Net.CHANNEL.send(PacketDistributor.SERVER.noArg(), new StopShieldPacket());
-                    else                 Net.CHANNEL.send(PacketDistributor.SERVER.noArg(), new StartShieldPacket());
-                });
-            }
-            prevShield = now;
-        }
-
-        // --- Flight toggle ---
-        if (Keybinds.FLIGHT_KEY != null) {
-            boolean now = Keybinds.FLIGHT_KEY.isDown();
-            if (now && !prevFlight) {
-                mc.player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(d -> {
-                    if (d.isFlying()) Net.CHANNEL.send(PacketDistributor.SERVER.noArg(), new StopFlightPacket());
-                    else               Net.CHANNEL.send(PacketDistributor.SERVER.noArg(), new StartFlightPacket());
-                });
-            }
-            prevFlight = now;
-        }
-
-        // --- Meditate toggle (C) — blocked if shielding/flying ---
-        boolean nowC = Keybinds.MEDITATE_KEY.isDown();
-        if (nowC && !prevC) {
-            mc.player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent((CultivationData d) -> {
-                if (d.isShielding() || d.isFlying()) {
-                    mc.player.displayClientMessage(Component.literal("Cannot meditate while shielding or flying."), true);
-                    return;
-                }
-                if (d.isMeditating()) Net.CHANNEL.send(PacketDistributor.SERVER.noArg(), new StopMeditatePacket());
-                else                  Net.CHANNEL.send(PacketDistributor.SERVER.noArg(), new StartMeditatePacket());
-            });
-        }
-        prevC = nowC;
-
-        // --- Rest toggle (B) — blocked if shielding/flying ---
-        if (Keybinds.REST_KEY != null) {
-            boolean nowRest = Keybinds.REST_KEY.isDown();
-            if (nowRest && !prevRest) {
-                mc.player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent((CultivationData d) -> {
-                    if (d.isShielding() || d.isFlying()) {
-                        mc.player.displayClientMessage(Component.literal("Cannot rest while shielding or flying."), true);
-                        return;
+    private static void handleMovementCancellation(LocalPlayer player) {
+        player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(data -> {
+            if ((data.isMeditating() || data.isResting()) && player.input != null) {
+                boolean isTryingToMove = player.input.up || player.input.down || player.input.left || player.input.right || player.input.jumping || player.input.shiftKeyDown;
+                if (isTryingToMove) {
+                    if (data.isMeditating()) {
+                        Net.CHANNEL.sendToServer(new StopMeditatePacket());
                     }
-                    if (d.isResting()) Net.CHANNEL.send(PacketDistributor.SERVER.noArg(), new StopRestPacket());
-                    else               Net.CHANNEL.send(PacketDistributor.SERVER.noArg(), new StartRestPacket());
-                });
-            }
-            prevRest = nowRest;
-        }
-
-        // --- Movement interrupt for rest/meditation ---
-        mc.player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent((CultivationData d) -> {
-            if ((d.isResting() || d.isMeditating()) && mc.player.input != null) {
-                boolean moving = mc.player.input.up || mc.player.input.down || mc.player.input.left || mc.player.input.right
-                        || mc.player.input.jumping || mc.player.input.shiftKeyDown;
-                if (moving) {
-                    if (d.isResting())    Net.CHANNEL.send(PacketDistributor.SERVER.noArg(), new StopRestPacket());
-                    if (d.isMeditating()) Net.CHANNEL.send(PacketDistributor.SERVER.noArg(), new StopMeditatePacket());
+                    if (data.isResting()) {
+                        Net.CHANNEL.sendToServer(new StopRestPacket());
+                    }
                 }
             }
         });
+    }
 
-        // --- Rhythm minigame tap (V) ---
-        // --- Meridians GUI (press V) ---
-        if (Keybinds.MERIDIANS_KEY != null) {
-            boolean now = Keybinds.MERIDIANS_KEY.isDown();
-            if (now && !prevSense) {
-                mc.player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(d -> {
-                    if (d.isMeditating() && d.getRealm() == com.bo.cultivatereg.cultivation.Realm.MORTAL) {
-                        mc.setScreen(new com.bo.cultivatereg.client.gui.MeridiansScreen());
-                    } else {
-                        mc.player.displayClientMessage(Component.literal("Meditate (C) to open meridians."), true);
-                    }
-                });
+    private static void handleAnimation(AbstractClientPlayer player) {
+        @SuppressWarnings("unchecked")
+        var animationLayer = (ModifierLayer<IAnimation>) PlayerAnimationAccess
+                .getPlayerAssociatedData(player)
+                .get(PlayerAnimationSetup.ANIMATION_LAYER_ID);
+        if (animationLayer == null) return;
+
+        player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(data -> {
+            boolean shouldBePosing = data.isMeditating() || data.isResting();
+            boolean isAnimating = animationLayer.getAnimation() != null;
+
+            if (shouldBePosing && !isAnimating) {
+                String key = data.isMeditating() ? "meditation" : "meditation"; // Fallback to meditation anim for now
+                var animationData = PlayerAnimationRegistry.getAnimation(
+                        ResourceLocation.fromNamespaceAndPath(CultivateReg.MODID, key));
+                if (animationData != null) {
+                    animationLayer.setAnimation(new KeyframeAnimationPlayer(animationData));
+                }
+            } else if (!shouldBePosing && isAnimating) {
+                animationLayer.setAnimation(null);
             }
-            prevSense = now; // reuse the boolean we already had
-        }
+        });
+    }
 
+    private static void handleKeybinds(LocalPlayer player) {
+        Minecraft mc = Minecraft.getInstance();
+        if (Keybinds.MEDITATE_KEY == null) return;
+
+        boolean qiSightNow = Keybinds.QI_SIGHT_KEY.isDown();
+        if (qiSightNow && !prevQiSight) {
+            boolean on = ClientState.toggleQiSight();
+            player.displayClientMessage(Component.literal(on ? "Qi Sight: ON" : "Qi Sight: OFF"), true);
+        }
+        prevQiSight = qiSightNow;
+
+        boolean shieldNow = Keybinds.SHIELD_KEY.isDown();
+        if (shieldNow && !prevShield) {
+            player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(d -> {
+                if (d.isShielding()) Net.CHANNEL.sendToServer(new StopShieldPacket());
+                else Net.CHANNEL.sendToServer(new StartShieldPacket());
+            });
+        }
+        prevShield = shieldNow;
+
+        boolean flightNow = Keybinds.FLIGHT_KEY.isDown();
+        if (flightNow && !prevFlight) {
+            player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(d -> {
+                if (d.isFlying()) Net.CHANNEL.sendToServer(new StopFlightPacket());
+                else Net.CHANNEL.sendToServer(new StartFlightPacket());
+            });
+        }
+        prevFlight = flightNow;
+
+        boolean meditateNow = Keybinds.MEDITATE_KEY.isDown();
+        if (meditateNow && !prevMeditate) {
+            player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(d -> {
+                if (d.isShielding() || d.isFlying()) {
+                    player.displayClientMessage(Component.literal("Cannot meditate while shielding or flying."), true);
+                    return;
+                }
+                if (d.isMeditating()) Net.CHANNEL.sendToServer(new StopMeditatePacket());
+                else Net.CHANNEL.sendToServer(new StartMeditatePacket());
+            });
+        }
+        prevMeditate = meditateNow;
+
+        boolean restNow = Keybinds.REST_KEY.isDown();
+        if (restNow && !prevRest) {
+            player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(d -> {
+                if (d.isShielding() || d.isFlying()) {
+                    player.displayClientMessage(Component.literal("Cannot rest while shielding or flying."), true);
+                    return;
+                }
+                if (d.isResting()) Net.CHANNEL.sendToServer(new StopRestPacket());
+                else Net.CHANNEL.sendToServer(new StartRestPacket());
+            });
+        }
+        prevRest = restNow;
+
+        boolean meridiansNow = Keybinds.MERIDIANS_KEY.isDown();
+        if (meridiansNow && !prevMeridians) {
+            player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(d -> {
+                if (d.isMeditating()) {
+                    mc.setScreen(new com.bo.cultivatereg.client.gui.MeridiansScreen());
+                } else {
+                    player.displayClientMessage(Component.literal("Meditate (C) to open meridians."), true);
+                }
+            });
+        }
+        prevMeridians = meridiansNow;
     }
-    }
+}
 
