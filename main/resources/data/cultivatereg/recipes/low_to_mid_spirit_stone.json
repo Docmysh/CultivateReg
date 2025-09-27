@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SSS",
+    "SSS",
+    "SSS"
+  ],
+  "key": {
+    "S": { "item": "cultivatereg:low_spirit_stone" }
+  },
+  "result": { "item": "cultivatereg:spirit_stone" }
+}
