@@ -17,13 +17,16 @@
   "screen.cultivatereg.manual.section.content": "Method",
   "screen.cultivatereg.manual.section.requirement": "Breakthrough Guidance",
   "screen.cultivatereg.manual.instructions": "Read carefully, then begin the comprehension test.",
+  "screen.cultivatereg.manual.page_hint": "Use the arrows or A/D keys to turn the pages.",
   "screen.cultivatereg.manual.begin": "Begin Comprehension Test",
   "screen.cultivatereg.manual.retake": "Retake Comprehension Test",
   "screen.cultivatereg.manual.quiz_heading": "Comprehension Test",
+  "screen.cultivatereg.manual.quiz_prompt": "Choose the answer that matches the teachings.",
   "screen.cultivatereg.manual.feedback.correct": "Correct. Continue to the next step.",
   "screen.cultivatereg.manual.feedback.incorrect": "Incorrect. Re-read the passage and try again.",
   "screen.cultivatereg.manual.feedback.complete": "You fully comprehend %s!",
-  "screen.cultivatereg.manual.already_mastered": "You have already mastered this manual."
-
+  "screen.cultivatereg.manual.already_mastered": "You have already mastered this manual.",
+  "screen.cultivatereg.manual.final_prompt": "Turn to the last page when you are ready to take the comprehension test.",
+  "screen.cultivatereg.manual.page_indicator": "Page %s / %s"
 
 }
