@@ -98,7 +98,6 @@ public class ClientEvents {
         CultivationData data = player.getCapability(CultivationCapability.CULTIVATION_CAP).orElse(null);
         boolean unlocked = data != null && data.isCultivationUnlocked();
         boolean qiSightNow = Keybinds.QI_SIGHT_KEY.isDown();
-        boolean qiSightNow = Keybinds.QI_SIGHT_KEY.isDown();
         if (qiSightNow && !prevQiSight) {
             if (!unlocked) {
                 player.displayClientMessage(Component.translatable("message.cultivatereg.cultivation.locked"), true);
