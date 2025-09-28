@@ -1,5 +1,6 @@
 package com.bo.cultivatereg.client.gui;
 
+import com.bo.cultivatereg.CultivateReg;
 import com.bo.cultivatereg.cultivation.CultivationCapability;
 import com.bo.cultivatereg.cultivation.manual.CultivationManual;
 import com.bo.cultivatereg.network.ManualQuizCompletePacket;
@@ -32,19 +33,20 @@ import java.util.List;
  */
 @OnlyIn(Dist.CLIENT)
 public class ManualStudyScreen extends Screen {
-    private static final ResourceLocation BOOK_TEXTURE = new ResourceLocation("minecraft", "textures/gui/book.png");
+    private static final ResourceLocation BOOK_TEXTURE = new ResourceLocation(CultivateReg.MODID, "textures/gui/manual_book.png");
+    private static final Component PAGE_BREAK = Component.literal("FORCE_PAGE_BREAK");
 
     // --- CORRECTED CONSTANTS ---
-    private static final int BOOK_WIDTH = 292;
+    private static final int BOOK_WIDTH = 258;
     private static final int BOOK_HEIGHT = 192;
     // Reduce the text width to fit within one page and leave a gap for the spine.
-    private static final int PAGE_TEXT_WIDTH = 114;
+    private static final int PAGE_TEXT_WIDTH = 100;
     private static final int PAGE_TEXT_HEIGHT = 130;
-    private static final int PAGE_BOTTOM_MARGIN = 10;
+    private static final int PAGE_BOTTOM_MARGIN = 8;
     // Adjust X coordinates for a two-page layout within the 192px book width.
-    private static final int LEFT_PAGE_X = 36; // Margin from the left edge of the book
+    private static final int LEFT_PAGE_X = 24; // Margin from the left edge of the book
     private static final int RIGHT_PAGE_X = BOOK_WIDTH / 2 + 10; // Start after the center spine
-    private static final int PAGE_TEXT_Y = 30; // Lowered to make space for a multi-line title
+    private static final int PAGE_TEXT_Y = 28; // Lowered to make space for a multi-line title
     // --- END OF CORRECTIONS ---
 
 
@@ -146,7 +148,7 @@ public class ManualStudyScreen extends Screen {
 
         if (beginButton != null) {
             beginButton.setPosition(bookLeft + RIGHT_PAGE_X,
-                    bookTop + PAGE_TEXT_Y + PAGE_TEXT_HEIGHT + 4);
+                    bookTop + PAGE_TEXT_Y + PAGE_TEXT_HEIGHT - 120);
         }
 
         int answerX = bookLeft + RIGHT_PAGE_X;
@@ -170,15 +172,20 @@ public class ManualStudyScreen extends Screen {
         allParagraphs.add(Component.translatable("screen.cultivatereg.manual.page_hint").withStyle(s -> s.withColor(PAGE_HINT_COLOR)));
         allParagraphs.add(Component.empty());
 
+
         allParagraphs.add(Component.translatable("screen.cultivatereg.manual.section.description")
                 .withStyle(style -> style.withColor(SECTION_HEADING_COLOR).withBold(true)));
         addMultilineParagraph(allParagraphs, manual.description(), BODY_TEXT_COLOR);
         allParagraphs.add(Component.empty());
 
+        allParagraphs.add(PAGE_BREAK);
+
         allParagraphs.add(Component.translatable("screen.cultivatereg.manual.section.content")
                 .withStyle(style -> style.withColor(SECTION_HEADING_COLOR).withBold(true)));
         addMultilineParagraph(allParagraphs, manual.content(), BODY_TEXT_COLOR);
         allParagraphs.add(Component.empty());
+
+        allParagraphs.add(PAGE_BREAK);
 
         allParagraphs.add(Component.translatable("screen.cultivatereg.manual.section.requirement")
                 .withStyle(style -> style.withColor(SECTION_HEADING_COLOR).withBold(true)));
@@ -196,6 +203,14 @@ public class ManualStudyScreen extends Screen {
         int maxLines = Math.max(1, baseLineCount - 1);
 
         for (Component component : allParagraphs) {
+            if (component == PAGE_BREAK) {
+                // If the current page isn't empty, add it to the book and start a fresh page.
+                if (!currentPage.isEmpty()) {
+                    pages.add(List.copyOf(currentPage));
+                    currentPage.clear();
+                }
+                continue; // Skip processing this marker as text
+            }
             // Handle empty components which represent blank lines.
             if (component.getString().isEmpty()) {
                 if (currentPage.size() >= maxLines) {
@@ -377,16 +392,16 @@ public class ManualStudyScreen extends Screen {
         graphics.blit(BOOK_TEXTURE, bookLeft, bookTop, 0, 0, BOOK_WIDTH, BOOK_HEIGHT);
 
         // --- RENDER MULTI-LINE TITLE ---
-        Component title = Component.translatable("screen.cultivatereg.manual.heading", manual.displayName());
-        int titleMaxWidth = BOOK_WIDTH - 44; // Give 22px margin on each side to match page text
-        int bookCenterX = bookLeft + BOOK_WIDTH / 2;
-        int currentY = bookTop + 12;
+       // Component title = Component.translatable("screen.cultivatereg.manual.heading", manual.displayName());
+       // int titleMaxWidth = BOOK_WIDTH - 44; // Give 22px margin on each side to match page text
+       // int bookCenterX = bookLeft + BOOK_WIDTH / 2;
+       // int currentY = bookTop + 12;
 
-        for (FormattedCharSequence line : this.font.split(title, titleMaxWidth)) {
-            int lineWidth = this.font.width(line);
-            graphics.drawString(this.font, line, bookCenterX - lineWidth / 2, currentY, 0x3F3F3F, false);
-            currentY += this.font.lineHeight;
-        }
+       // for (FormattedCharSequence line : this.font.split(title, titleMaxWidth)) {
+        //    int lineWidth = this.font.width(line);
+         //   graphics.drawString(this.font, line, bookCenterX - lineWidth / 2, currentY, 0x3F3F3F, false);
+         //   currentY += this.font.lineHeight;
+        // }
         // --- END OF TITLE RENDER ---
 
         if (!manualStack.isEmpty()) {

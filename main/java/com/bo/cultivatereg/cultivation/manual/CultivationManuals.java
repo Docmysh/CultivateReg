@@ -25,7 +25,7 @@ public final class CultivationManuals {
                     "Close your eyes and let your breath become the bridge between heaven and earth. Inhale slowly, and imagine the mist of the mountains flowing into your lungs. Guide that mist downward, where it condenses into a single drop of light at your lower abdomen—the dantian. From there, let the light seek out the meridians, the hidden rivers within the flesh. Each channel you open allows Qi to flow more freely, strengthening body and spirit alike. Beware: forcing Qi through sealed meridians will cause backlash and destroy your foundation. Patience is the cultivator’s first weapon."
                     """,
                     "After reading, the player must correctly answer three questions. Passing represents true comprehension " +
-                            "of the manual, which then unlocks the ability to open meridians and advance toward the Foundation Establishment stage.",
+                            "of the manual, which then unlocks the ability to open meridians and advance toward the Qi Gathering realm.",
                     Realm.MORTAL,
                     Realm.QI_GATHERING,
                     3,
