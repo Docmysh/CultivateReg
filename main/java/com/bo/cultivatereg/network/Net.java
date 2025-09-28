@@ -56,6 +56,9 @@ public class Net {
                 SenseAttemptPacket::encode, SenseAttemptPacket::decode, SenseAttemptPacket::handle);
         CHANNEL.registerMessage(id++, BreakthroughPacket.class,
                 BreakthroughPacket::encode, BreakthroughPacket::decode, BreakthroughPacket::handle);
+        // Manual study
+        CHANNEL.registerMessage(id++, ManualQuizCompletePacket.class,
+                ManualQuizCompletePacket::encode, ManualQuizCompletePacket::decode, ManualQuizCompletePacket::handle);
     }
 
     /** Player cultivation sync (now includes meridian mask + progress). */

@@ -10,7 +10,20 @@
   "item.cultivatereg.top_spirit_stone": "Top-Grade Spirit Stone",
   "item.cultivatereg.basic_qi_manual": "Basic Qi Gathering Manual",
   "item.cultivatereg.basic_qi_manual.tooltip": "Every cultivator begins with this manual; even if another tries to change it, your path falls back to the basics.",
-  "item.cultivatereg.basic_qi_manual.message": "You review the Basic Qi Gathering principles. Your manual alignment remains unchanged."
+  "item.cultivatereg.basic_qi_manual.message": "You begin studying the Basic Qi Gathering Manual.",
+  "message.cultivatereg.manual.completed": "Your understanding of %s deepens; your Qi flows more smoothly.",
+  "screen.cultivatereg.manual.heading": "%s Study",
+  "screen.cultivatereg.manual.section.description": "Overview",
+  "screen.cultivatereg.manual.section.content": "Method",
+  "screen.cultivatereg.manual.section.requirement": "Breakthrough Guidance",
+  "screen.cultivatereg.manual.instructions": "Read carefully, then begin the comprehension test.",
+  "screen.cultivatereg.manual.begin": "Begin Comprehension Test",
+  "screen.cultivatereg.manual.retake": "Retake Comprehension Test",
+  "screen.cultivatereg.manual.quiz_heading": "Comprehension Test",
+  "screen.cultivatereg.manual.feedback.correct": "Correct. Continue to the next step.",
+  "screen.cultivatereg.manual.feedback.incorrect": "Incorrect. Re-read the passage and try again.",
+  "screen.cultivatereg.manual.feedback.complete": "You fully comprehend %s!",
+  "screen.cultivatereg.manual.already_mastered": "You have already mastered this manual."
 
 
 }

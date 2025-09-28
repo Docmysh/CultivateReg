@@ -1,6 +1,8 @@
 package com.bo.cultivatereg.item;
 
+import com.bo.cultivatereg.client.gui.ManualStudyScreen;
 import com.bo.cultivatereg.cultivation.CultivationCapability;
+import com.bo.cultivatereg.cultivation.manual.CultivationManual;
 import com.bo.cultivatereg.cultivation.manual.CultivationManuals;
 import com.bo.cultivatereg.network.Net;
 import net.minecraft.ChatFormatting;
@@ -13,6 +15,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,24 +30,16 @@ public class BasicQiManualItem extends Item {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, Player player, @NotNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+        CultivationManual manual = CultivationManuals.BASIC_QI_GATHERING;
         if (!level.isClientSide) {
             player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(data -> {
-                var manual = CultivationManuals.BASIC_QI_GATHERING;
                 boolean changed = false;
 
                 if (!manual.id().equals(data.getManualId())) {
                     data.setManualId(manual.id());
-                    changed = true;
-                }
-
-                int quizSize = manual.quiz().size();
-                if (data.getManualQuizProgress() < quizSize) {
-                    data.setManualQuizProgress(quizSize);
-                    changed = true;
-                }
-
-                if (!data.isManualQuizPassed()) {
-                    data.setManualQuizPassed(true);
+                    data.setManualQuizProgress(0);
+                    // Do not auto-pass the quiz; the player must complete it from the study screen.
+                    data.setManualQuizPassed(false);
                     changed = true;
                 }
 
@@ -53,6 +49,8 @@ public class BasicQiManualItem extends Item {
             });
 
             player.sendSystemMessage(Component.translatable("item.cultivatereg.basic_qi_manual.message"));
+        } else {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ManualStudyScreen.open(manual, stack));
         }
 
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
