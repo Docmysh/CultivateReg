@@ -42,6 +42,9 @@ public class CultivationCapability {
             tag.putFloat("sensep", backend.getSenseProgress());
             tag.putFloat("spirit", backend.getSpirit()); // combat pool
             tag.putBoolean("rest", backend.isResting());
+            tag.putString("manual", backend.getManualId().toString());
+            tag.putInt("manualProg", backend.getManualQuizProgress());
+            tag.putBoolean("manualPassed", backend.isManualQuizPassed());
 
             // --- meridians (mask + per-node progress) ---
             int mask = 0;
@@ -69,6 +72,11 @@ public class CultivationCapability {
             backend.setSenseProgress(tag.getFloat("sensep"));
             backend.setSpirit(tag.contains("spirit") ? tag.getFloat("spirit") : 0f);
             backend.setResting(false);
+            if (tag.contains("manual")) {
+                backend.setManualId(ResourceLocation.tryParse(tag.getString("manual")));
+            }
+            backend.setManualQuizProgress(tag.contains("manualProg") ? tag.getInt("manualProg") : 0);
+            backend.setManualQuizPassed(tag.getBoolean("manualPassed"));
 
             // --- meridians ---
             int mask = tag.getInt("merMask");
@@ -102,6 +110,9 @@ public class CultivationCapability {
                 newCap.setSpirit(oldCap.getSpirit()); // carry over combat pool
                 newCap.setMeditating(false);
                 if (newCap instanceof CultivationDataImpl impl) impl.setResting(false);
+                newCap.setManualId(oldCap.getManualId());
+                newCap.setManualQuizProgress(oldCap.getManualQuizProgress());
+                newCap.setManualQuizPassed(oldCap.isManualQuizPassed());
 
                 // --- meridians ---
                 for (int i = 0; i < CultivationData.MERIDIANS; i++) {

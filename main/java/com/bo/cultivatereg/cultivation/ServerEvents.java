@@ -1,6 +1,7 @@
 package com.bo.cultivatereg.cultivation;
 
 import com.bo.cultivatereg.CultivateReg;
+import com.bo.cultivatereg.cultivation.manual.CultivationManuals;
 import com.bo.cultivatereg.network.Net;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -112,7 +113,16 @@ public class ServerEvents {
                     data.addQi(rate);
                     dirty = true;
                     boolean progressed = false;
+                    var manual = CultivationManuals.byId(data.getManualId());
                     while (data.getRealm() != Realm.MORTAL) {
+                        var stageCap = manual.stageCapFor(data.getRealm());
+                        if (stageCap.isPresent() && data.getStage() >= stageCap.getAsInt()) {
+                            int limit = data.getRealm().capForStage(data.getStage());
+                            if (limit > 0 && data.getQi() > limit) {
+                                data.setQi(limit);
+                            }
+                            break;
+                        }
                         int cap = data.getRealm().capForStage(data.getStage());
                         if (data.getQi() + 1e-6f >= cap) {
                             if (data.getStage() < 9) {

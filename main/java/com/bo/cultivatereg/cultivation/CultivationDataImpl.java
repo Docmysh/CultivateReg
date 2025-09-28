@@ -1,5 +1,8 @@
 package com.bo.cultivatereg.cultivation;
 
+import com.bo.cultivatereg.cultivation.manual.CultivationManuals;
+import net.minecraft.resources.ResourceLocation;
+
 public class CultivationDataImpl implements CultivationData {
     private Realm realm = Realm.MORTAL;
     private int stage = 1;                 // 1..9 for non-mortal
@@ -19,6 +22,11 @@ public class CultivationDataImpl implements CultivationData {
     // Meridians
     private final boolean[] meridianOpen = new boolean[MERIDIANS];
     private final int[] meridianProg = new int[MERIDIANS];
+
+    // Manuals
+    private ResourceLocation manualId = CultivationManuals.BASIC_QI_GATHERING.id();
+    private int manualQuizProgress = 0;
+    private boolean manualQuizPassed = false;
 
     @Override public boolean isMeridianOpen(int i) { return i>=0 && i<MERIDIANS && meridianOpen[i]; }
     @Override public void setMeridianOpen(int i, boolean v) { if (i>=0 && i<MERIDIANS) meridianOpen[i]=v; }
@@ -67,4 +75,18 @@ public class CultivationDataImpl implements CultivationData {
     // ---- NEW: Qi Sight toggle ----
     @Override public boolean isQiSight() { return qiSight; }
     @Override public void setQiSight(boolean v) { this.qiSight = v; }
+
+    // ---- Manuals ----
+    @Override public ResourceLocation getManualId() { return manualId; }
+    @Override public void setManualId(ResourceLocation id) {
+        ResourceLocation resolved = (id != null && CultivationManuals.exists(id))
+                ? id
+                : CultivationManuals.BASIC_QI_GATHERING.id();
+        this.manualId = resolved;
+    }
+    @Override public int getManualQuizProgress() { return manualQuizProgress; }
+    @Override public void setManualQuizProgress(int value) { this.manualQuizProgress = Math.max(0, value); }
+    @Override public boolean isManualQuizPassed() { return manualQuizPassed; }
+    @Override public void setManualQuizPassed(boolean value) { this.manualQuizPassed = value; }
 }
+

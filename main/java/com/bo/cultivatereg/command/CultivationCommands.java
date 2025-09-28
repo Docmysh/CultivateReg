@@ -2,6 +2,8 @@ package com.bo.cultivatereg.command;
 
 import com.bo.cultivatereg.CultivateReg;
 import com.bo.cultivatereg.cultivation.*;
+import com.bo.cultivatereg.cultivation.manual.CultivationManual;
+import com.bo.cultivatereg.cultivation.manual.CultivationManuals;
 import com.bo.cultivatereg.network.Net;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -10,6 +12,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -26,10 +29,15 @@ public class CultivationCommands {
                 .then(Commands.literal("info").executes(ctx -> {
                     ServerPlayer sp = ctx.getSource().getPlayerOrException();
                     sp.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(data -> {
+                        CultivationManual manual = CultivationManuals.byId(data.getManualId());
                         msg(ctx.getSource(), "Realm=%s, Stage=%d, Qi=%.1f, Cap=%d, Meditating=%s, Sensed=%s, SenseProg=%.0f/100",
                                 data.getRealm().name(), data.getStage(), data.getQi(),
                                 data.getRealm()==Realm.MORTAL?0:data.getRealm().capForStage(data.getStage()),
                                 data.isMeditating(), data.hasSensed(), data.getSenseProgress());
+                        msg(ctx.getSource(), "Manual=%s (%s), Quiz=%d/%d, Passed=%s",
+                                manual.displayName(), manual.id(),
+                                data.getManualQuizProgress(), manual.quiz().size(),
+                                data.isManualQuizPassed());
                     });
                     return 1;
                 }))
@@ -99,6 +107,51 @@ public class CultivationCommands {
                             });
                             return 1;
                         })))
+                .then(Commands.literal("manual")
+                        .then(Commands.literal("set")
+                                .then(Commands.argument("id", ResourceLocationArgument.id()).executes(ctx -> {
+                                    var id = ResourceLocationArgument.getId(ctx, "id");
+                                    if (!CultivationManuals.exists(id)) {
+                                        msg(ctx.getSource(), "Unknown manual id %s", id);
+                                        return 0;
+                                    }
+                                    ServerPlayer sp = ctx.getSource().getPlayerOrException();
+                                    sp.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(data -> {
+                                        data.setManualId(id);
+                                        data.setManualQuizProgress(0);
+                                        data.setManualQuizPassed(false);
+                                        Net.sync(sp, data);
+                                    });
+                                    msg(ctx.getSource(), "Manual set to %s", id);
+                                    return 1;
+                                })))
+                        .then(Commands.literal("pass").executes(ctx -> {
+                            ServerPlayer sp = ctx.getSource().getPlayerOrException();
+                            sp.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(data -> {
+                                CultivationManual manual = CultivationManuals.byId(data.getManualId());
+                                data.setManualQuizPassed(true);
+                                data.setManualQuizProgress(Math.max(data.getManualQuizProgress(), manual.quiz().size()));
+                                Net.sync(sp, data);
+                            });
+                            msg(ctx.getSource(), "Manual quiz marked as passed");
+                            return 1;
+                        }))
+                        .then(Commands.literal("reset").executes(ctx -> {
+                            ServerPlayer sp = ctx.getSource().getPlayerOrException();
+                            sp.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(data -> {
+                                data.setManualQuizPassed(false);
+                                data.setManualQuizProgress(0);
+                                Net.sync(sp, data);
+                            });
+                            msg(ctx.getSource(), "Manual progress reset");
+                            return 1;
+                        }))
+                        .then(Commands.literal("list").executes(ctx -> {
+                            CultivationManuals.all().forEach((id, manual) ->
+                                    msg(ctx.getSource(), "%s - %s", id, manual.displayName()));
+                            return 1;
+                        }))
+                )
         );
     }
 

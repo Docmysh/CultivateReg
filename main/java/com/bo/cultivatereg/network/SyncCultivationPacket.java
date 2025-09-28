@@ -5,6 +5,7 @@ import com.bo.cultivatereg.cultivation.CultivationData;
 import com.bo.cultivatereg.cultivation.Realm;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -20,6 +21,9 @@ public record SyncCultivationPacket(
         boolean resting,
         boolean shielding,
         boolean flying,
+        ResourceLocation manualId,
+        int manualQuizProgress,
+        boolean manualQuizPassed,
         int meridianMask,
         byte[] meridianProgress
 ) {
@@ -34,6 +38,9 @@ public record SyncCultivationPacket(
         buf.writeBoolean(pkt.resting());
         buf.writeBoolean(pkt.shielding());
         buf.writeBoolean(pkt.flying());
+        buf.writeResourceLocation(pkt.manualId());
+        buf.writeVarInt(pkt.manualQuizProgress());
+        buf.writeBoolean(pkt.manualQuizPassed());
         buf.writeVarInt(pkt.meridianMask());
         buf.writeVarInt(pkt.meridianProgress().length);
         buf.writeByteArray(pkt.meridianProgress());
@@ -50,6 +57,9 @@ public record SyncCultivationPacket(
         boolean resting = buf.readBoolean();
         boolean shielding = buf.readBoolean();
         boolean flying = buf.readBoolean();
+        ResourceLocation manualId = buf.readResourceLocation();
+        int manualQuizProgress = buf.readVarInt();
+        boolean manualQuizPassed = buf.readBoolean();
         int mask = buf.readVarInt();
         int n = buf.readVarInt();
         byte[] prog = buf.readByteArray(n);
@@ -57,6 +67,7 @@ public record SyncCultivationPacket(
                 realmOrdinal, stage, qi,
                 meditating, sensed, senseProgress,
                 spirit, resting, shielding, flying,
+                manualId, manualQuizProgress, manualQuizPassed,
                 mask, prog
         );
     }
@@ -77,6 +88,9 @@ public record SyncCultivationPacket(
                 data.setResting(pkt.resting());
                 data.setShielding(pkt.shielding());
                 data.setFlying(pkt.flying());
+                data.setManualId(pkt.manualId());
+                data.setManualQuizProgress(pkt.manualQuizProgress());
+                data.setManualQuizPassed(pkt.manualQuizPassed());
 
                 // meridians
                 for (int i = 0; i < CultivationData.MERIDIANS && i < pkt.meridianProgress().length; i++) {

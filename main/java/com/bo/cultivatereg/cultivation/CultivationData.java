@@ -51,6 +51,14 @@ public interface CultivationData {
         return 1.0f + 0.04f * getOpenMeridianCount();
     }
 
+    // --- Manuals ---
+    net.minecraft.resources.ResourceLocation getManualId();
+    void setManualId(net.minecraft.resources.ResourceLocation id);
+    int getManualQuizProgress();
+    void setManualQuizProgress(int value);
+    boolean isManualQuizPassed();
+    void setManualQuizPassed(boolean value);
+
 
 
 

@@ -4,6 +4,7 @@ package com.bo.cultivatereg.client.gui;
 import com.bo.cultivatereg.cultivation.CultivationCapability;
 import com.bo.cultivatereg.cultivation.CultivationData;
 import com.bo.cultivatereg.cultivation.Realm;
+import com.bo.cultivatereg.cultivation.manual.CultivationManuals;
 import com.bo.cultivatereg.network.BreakthroughPacket;
 import com.bo.cultivatereg.network.Net;
 import com.bo.cultivatereg.network.SenseAttemptPacket;
@@ -63,7 +64,11 @@ public class MeridiansScreen extends Screen {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
         mc.player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(d -> {
-            if (d.isMeditating() && d.getRealm() == Realm.MORTAL && d.getOpenMeridianCount() >= 1) {
+            var manual = CultivationManuals.byId(d.getManualId());
+            boolean manualOk = d.isManualQuizPassed()
+                    && manual.canBreakthroughFrom(d.getRealm())
+                    && manual.targetRealm() == Realm.QI_GATHERING;
+            if (manualOk && d.isMeditating() && d.getRealm() == Realm.MORTAL && d.getOpenMeridianCount() >= 1) {
                 Net.CHANNEL.sendToServer(new BreakthroughPacket());
             }
         });
@@ -78,9 +83,14 @@ public class MeridiansScreen extends Screen {
             return;
         }
         mc.player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(d -> {
+            var manual = CultivationManuals.byId(d.getManualId());
+            boolean manualOk = d.isManualQuizPassed()
+                    && manual.canBreakthroughFrom(d.getRealm())
+                    && manual.targetRealm() == Realm.QI_GATHERING;
             boolean ok = d.isMeditating()
                     && d.getRealm() == Realm.MORTAL
-                    && d.getOpenMeridianCount() >= 1;
+                    && d.getOpenMeridianCount() >= 1
+                    && manualOk;
             breakthrough.active = ok;
         });
     }

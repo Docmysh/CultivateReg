@@ -12,7 +12,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class Net {
-    private static final String PROTO = "6";
+    private static final String PROTO = "7";
     public static SimpleChannel CHANNEL;
 
     /** Call this once during common setup (you likely already do). */
@@ -79,6 +79,9 @@ public class Net {
                         data.isResting(),
                         data.isShielding(),
                         data.isFlying(),
+                        data.getManualId(),
+                        data.getManualQuizProgress(),
+                        data.isManualQuizPassed(),
                         mask,
                         prog
                 )
