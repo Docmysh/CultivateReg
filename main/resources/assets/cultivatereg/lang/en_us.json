@@ -7,7 +7,10 @@
   "item.cultivatereg.low_spirit_stone": "Low-Grade Spirit Stone",
   "item.cultivatereg.spirit_stone": "Mid-Grade Spirit Stone",
   "item.cultivatereg.high_spirit_stone": "High-Grade Spirit Stone",
-  "item.cultivatereg.top_spirit_stone": "Top-Grade Spirit Stone"
+  "item.cultivatereg.top_spirit_stone": "Top-Grade Spirit Stone",
+  "item.cultivatereg.basic_qi_manual": "Basic Qi Gathering Manual",
+  "item.cultivatereg.basic_qi_manual.tooltip": "Every cultivator begins with this manual; even if another tries to change it, your path falls back to the basics.",
+  "item.cultivatereg.basic_qi_manual.message": "You review the Basic Qi Gathering principles. Your manual alignment remains unchanged."
 
 
 }

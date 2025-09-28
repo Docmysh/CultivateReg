@@ -1,6 +1,7 @@
 package com.bo.cultivatereg.registry;
 
 import com.bo.cultivatereg.CultivateReg;
+import com.bo.cultivatereg.item.BasicQiManualItem;
 import com.bo.cultivatereg.item.SpiritStoneItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -24,6 +25,8 @@ public class ModItems {
     public static final RegistryObject<Item> TOP_GRADE_SPIRIT_STONE =
             ITEMS.register("top_spirit_stone", () -> new SpiritStoneItem(0xFF4A4A, new Item.Properties().stacksTo(64)));
 
+    public static final RegistryObject<Item> BASIC_QI_MANUAL =
+            ITEMS.register("basic_qi_manual", () -> new BasicQiManualItem(new Item.Properties().stacksTo(1)));
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
     }

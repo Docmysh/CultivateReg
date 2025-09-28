@@ -13,16 +13,23 @@ import java.util.OptionalInt;
 public final class CultivationManual {
     private final ResourceLocation id;
     private final String displayName;
+    private final String description;
+    private final String content;
+    private final String breakthroughRequirement;
     private final Realm prerequisiteRealm;
     private final Realm targetRealm;
     private final int maxStage;
     private final List<ManualQuestion> quiz;
 
     public CultivationManual(ResourceLocation id, String displayName,
+                             String description, String content, String breakthroughRequirement,
                              Realm prerequisiteRealm, Realm targetRealm,
                              int maxStage, List<ManualQuestion> quiz) {
         this.id = Objects.requireNonNull(id, "id");
         this.displayName = Objects.requireNonNull(displayName, "displayName");
+        this.description = Objects.requireNonNull(description, "description");
+        this.content = Objects.requireNonNull(content, "content");
+        this.breakthroughRequirement = Objects.requireNonNull(breakthroughRequirement, "breakthroughRequirement");
         this.prerequisiteRealm = Objects.requireNonNull(prerequisiteRealm, "prerequisiteRealm");
         this.targetRealm = Objects.requireNonNull(targetRealm, "targetRealm");
         this.maxStage = maxStage;
@@ -35,6 +42,18 @@ public final class CultivationManual {
 
     public String displayName() {
         return displayName;
+    }
+
+    public String description() {
+        return description;
+    }
+
+    public String content() {
+        return content;
+    }
+
+    public String breakthroughRequirement() {
+        return breakthroughRequirement;
     }
 
     public Realm prerequisiteRealm() {
