@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -33,32 +34,32 @@ public final class CultivationManuals {
                             new ManualQuestion(
                                     "What is the role of the dantian in Qi Gathering?",
                                     List.of(
-                                            "It is the vessel where Qi condenses and is stored.",
-                                            "It is the core that immediately transforms Qi into elemental powers.",
-                                            "It is a chamber in the heart that circulates blood.",
-                                            "It is the gate that summons spirits from the heavens."
+                                            "Condense and store Qi",
+                                            "Fuck if I know",
+                                            "TLDR",
+                                            "Cultivation bs"
                                     ),
-                                    0
+                                    Set.of(0, 4)
                             ),
                             new ManualQuestion(
                                     "How should Qi be guided through the body?",
                                     List.of(
-                                            "Slowly and patiently through the meridians, never by force.",
-                                            "By violently ramming Qi through until the body adapts.",
-                                            "By storing it only in the lungs without moving it further.",
-                                            "By letting it scatter freely without direction."
+                                            "Slowly through the meridians.",
+                                            "TLDR",
+                                            "Js do it",
+                                            "Cultivation bs?"
                                     ),
-                                    0
+                                    Set.of(0, 4)
                             ),
                             new ManualQuestion(
                                     "What danger comes from forcing Qi through unopened meridians?",
                                     List.of(
-                                            "Backlash that can damage or destroy the foundation.",
-                                            "The cultivator will instantly ascend to immortality.",
-                                            "The meridians will vanish and never form again.",
-                                            "The dantian will overflow and turn into a spirit beast."
+                                            "A destroyed foundation.",
+                                            "Clearly no danger",
+                                            "TLDR",
+                                            "Nothing cause cultivation bs"
                                     ),
-                                    0
+                                    Set.of(0, 4)
                             )
                     )
             )

@@ -294,7 +294,7 @@ public class ManualStudyScreen extends Screen {
         }
 
         var question = manual.quiz().get(questionIndex);
-        if (optionIndex == question.correctIndex()) {
+        if (question.correctIndices().contains(optionIndex)) {
             questionIndex++;
             if (questionIndex >= manual.quiz().size()) {
                 feedback = Component.translatable("screen.cultivatereg.manual.feedback.complete", manual.displayName())
