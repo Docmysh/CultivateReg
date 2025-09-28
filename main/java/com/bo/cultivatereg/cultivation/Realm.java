@@ -287,5 +287,52 @@ public enum Realm {
         }
     }
 
-    private record PlayerScaling(double base, double perStage) {
+    private static final class PlayerScaling {
         static final PlayerScaling ZERO = new PlayerScaling(0.0, 0.0);
+
+        private final double base;
+        private final double perStage;
+
+        private PlayerScaling(double base, double perStage) {
+            this.base = base;
+            this.perStage = perStage;
+        }
+
+        double value(int stage) {
+            if (stage <= 0) {
+                return 0.0;
+            }
+            return base + perStage * Math.max(0, stage - 1);
+        }
+    }
+
+    public static final class PlayerModifiers {
+        private final double hpAdd;
+        private final double speedMul;
+        private final double dmgAdd;
+        private final double kbMul;
+
+        public PlayerModifiers(double hpAdd, double speedMul, double dmgAdd, double kbMul) {
+            this.hpAdd = hpAdd;
+            this.speedMul = speedMul;
+            this.dmgAdd = dmgAdd;
+            this.kbMul = kbMul;
+        }
+
+        public double hpAdd() {
+            return hpAdd;
+        }
+
+        public double speedMul() {
+            return speedMul;
+        }
+
+        public double dmgAdd() {
+            return dmgAdd;
+        }
+
+        public double kbMul() {
+            return kbMul;
+        }
+    }
+}
