@@ -7,17 +7,18 @@ import com.bo.cultivatereg.registry.ModEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.poi.PoiManager;
-import net.minecraft.world.level.poi.PoiRecord;
-import net.minecraft.world.level.poi.PoiType;
-import net.minecraft.world.level.poi.PoiTypes;
+import net.minecraft.world.entity.ai.village.poi.PoiManager;
+import net.minecraft.world.entity.ai.village.poi.PoiRecord;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.entity.ai.village.poi.PoiTypes;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.Random;
+
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -84,7 +85,8 @@ public class HomelessManSpawner {
             level.removeBlock(spawnPos, false);
             return;
         }
-        entity.moveTo(spawnPos.getX() + 0.5D, spawnPos.getY() + 1.0D, spawnPos.getZ() + 0.5D, level.random.nextFloat() * 360.0F, 0.0F);
+        entity.moveTo(spawnPos.getX() + 0.5D, spawnPos.getY() + 1.0D, spawnPos.getZ() + 0.5D, level.getRandom().nextFloat() * 360.0F, 0.0F);
+        RandomSource random = level.getRandom();
         entity.setTrashCanPos(spawnPos);
         entity.setVillageCenter(poiPos);
         level.addFreshEntity(entity);
@@ -111,7 +113,7 @@ public class HomelessManSpawner {
             mutable.move(Direction.DOWN);
             BlockState state = level.getBlockState(mutable);
             if (!state.isAir()) {
-                if (state.getMaterial().isSolid()) {
+                if (state.isFaceSturdy(level, mutable, Direction.UP)) {
                     return mutable.immutable();
                 }
             }

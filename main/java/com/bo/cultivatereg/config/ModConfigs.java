@@ -73,6 +73,11 @@ public class ModConfigs {
         public final ForgeConfigSpec.DoubleValue creeperCoreRealmMult;
         public final ForgeConfigSpec.DoubleValue creeperAdvancedRealmStep;
 
+        // --- Client-facing custom assets ---
+        public final ForgeConfigSpec.ConfigValue<String> boozeTexture;
+        public final ForgeConfigSpec.ConfigValue<String> dirtyTrashcanTexture;
+        public final ForgeConfigSpec.ConfigValue<String> homelessSkinTexture;
+
         public Common(ForgeConfigSpec.Builder b) {
             b.push("cultivation_mobs");
             cultivatedSpawnChance = b.comment("Chance (0..1) a natural mob rolls cultivation")
@@ -145,6 +150,21 @@ public class ModConfigs {
 
             // NEW (name used by your packets)
             heavenlySwordHover       = b.defineInRange("hover",       18.0d, 0d,   256d);
+            b.pop();
+
+            b.push("custom_assets");
+            boozeTexture = b.comment(
+                            "Resource location (namespace:path) that points to the booze item texture."
+                    )
+                    .define("boozeTexture", "cultivatereg:textures/item/booze.png");
+            dirtyTrashcanTexture = b.comment(
+                            "Resource location that points to the dirty trashcan block texture."
+                    )
+                    .define("dirtyTrashcanTexture", "cultivatereg:textures/block/dirty_trashcan.png");
+            homelessSkinTexture = b.comment(
+                            "Resource location that points to the homeless man skin."
+                    )
+                    .define("homelessSkinTexture", "cultivatereg:textures/entity/homeless.png");
             b.pop();
         }
     }
