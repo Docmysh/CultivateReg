@@ -34,14 +34,19 @@ import java.util.List;
 public class ManualStudyScreen extends Screen {
     private static final ResourceLocation BOOK_TEXTURE = new ResourceLocation("minecraft", "textures/gui/book.png");
 
-    private static final int BOOK_WIDTH = 192;
+    // --- CORRECTED CONSTANTS ---
+    private static final int BOOK_WIDTH = 292;
     private static final int BOOK_HEIGHT = 192;
+    // Reduce the text width to fit within one page and leave a gap for the spine.
     private static final int PAGE_TEXT_WIDTH = 114;
-    private static final int PAGE_TEXT_HEIGHT = 120;
-    private static final int PAGE_BOTTOM_MARGIN = 18;
-    private static final int LEFT_PAGE_X = 36;
-    private static final int RIGHT_PAGE_X = 36 + 116;
-    private static final int PAGE_TEXT_Y = 30;
+    private static final int PAGE_TEXT_HEIGHT = 130;
+    private static final int PAGE_BOTTOM_MARGIN = 10;
+    // Adjust X coordinates for a two-page layout within the 192px book width.
+    private static final int LEFT_PAGE_X = 36; // Margin from the left edge of the book
+    private static final int RIGHT_PAGE_X = BOOK_WIDTH / 2 + 10; // Start after the center spine
+    private static final int PAGE_TEXT_Y = 30; // Lowered to make space for a multi-line title
+    // --- END OF CORRECTIONS ---
+
 
     private static final int BODY_TEXT_COLOR = 0x3F3F3F;
     private static final int INSTRUCTION_TEXT_COLOR = 0x473820;
@@ -55,7 +60,7 @@ public class ManualStudyScreen extends Screen {
     private final CultivationManual manual;
     private final ItemStack manualStack;
 
-    private final List<List<FormattedCharSequence>> pages = new ArrayList<>();
+    private final List<List<PageLine>> pages = new ArrayList<>();
     private final List<Button> optionButtons = new ArrayList<>();
 
     private PageButton previousPageButton;
@@ -155,72 +160,76 @@ public class ManualStudyScreen extends Screen {
 
     private void rebuildPages() {
         pages.clear();
-        List<Component> paragraphs = new ArrayList<>();
+        // 1. Amalgamate all text components into a single list.
+        List<Component> allParagraphs = new ArrayList<>();
 
         Component intro = alreadyMastered
-                ? Component.translatable("screen.cultivatereg.manual.already_mastered")
-                .withStyle(style -> style.withColor(0x55FFFF))
-                : Component.translatable("screen.cultivatereg.manual.instructions")
-                .withStyle(style -> style.withColor(INSTRUCTION_TEXT_COLOR));
-        paragraphs.add(intro);
-        paragraphs.add(Component.translatable("screen.cultivatereg.manual.page_hint")
-                .withStyle(style -> style.withColor(PAGE_HINT_COLOR)));
-        paragraphs.add(Component.empty());
+                ? Component.translatable("screen.cultivatereg.manual.already_mastered").withStyle(s -> s.withColor(0x55FFFF))
+                : Component.translatable("screen.cultivatereg.manual.instructions").withStyle(s -> s.withColor(INSTRUCTION_TEXT_COLOR));
+        allParagraphs.add(intro);
+        allParagraphs.add(Component.translatable("screen.cultivatereg.manual.page_hint").withStyle(s -> s.withColor(PAGE_HINT_COLOR)));
+        allParagraphs.add(Component.empty());
 
-        paragraphs.add(Component.translatable("screen.cultivatereg.manual.section.description")
+        allParagraphs.add(Component.translatable("screen.cultivatereg.manual.section.description")
                 .withStyle(style -> style.withColor(SECTION_HEADING_COLOR).withBold(true)));
-        addMultilineParagraph(paragraphs, manual.description(), BODY_TEXT_COLOR);
-        paragraphs.add(Component.empty());
+        addMultilineParagraph(allParagraphs, manual.description(), BODY_TEXT_COLOR);
+        allParagraphs.add(Component.empty());
 
-        paragraphs.add(Component.translatable("screen.cultivatereg.manual.section.content")
+        allParagraphs.add(Component.translatable("screen.cultivatereg.manual.section.content")
                 .withStyle(style -> style.withColor(SECTION_HEADING_COLOR).withBold(true)));
-        addMultilineParagraph(paragraphs, manual.content(), BODY_TEXT_COLOR);
-        paragraphs.add(Component.empty());
+        addMultilineParagraph(allParagraphs, manual.content(), BODY_TEXT_COLOR);
+        allParagraphs.add(Component.empty());
 
-        paragraphs.add(Component.translatable("screen.cultivatereg.manual.section.requirement")
+        allParagraphs.add(Component.translatable("screen.cultivatereg.manual.section.requirement")
                 .withStyle(style -> style.withColor(SECTION_HEADING_COLOR).withBold(true)));
-        addMultilineParagraph(paragraphs, manual.breakthroughRequirement(), BODY_TEXT_COLOR);
-        paragraphs.add(Component.empty());
+        addMultilineParagraph(allParagraphs, manual.breakthroughRequirement(), BODY_TEXT_COLOR);
+        allParagraphs.add(Component.empty());
 
-        paragraphs.add(Component.translatable("screen.cultivatereg.manual.final_prompt")
+        allParagraphs.add(Component.translatable("screen.cultivatereg.manual.final_prompt")
                 .withStyle(style -> style.withColor(FINAL_PROMPT_COLOR)));
-        paragraphs.add(Component.empty());
+        allParagraphs.add(Component.empty());
 
-        List<FormattedCharSequence> current = new ArrayList<>();
-        int maxLines = Math.max(1, (PAGE_TEXT_HEIGHT - PAGE_BOTTOM_MARGIN) / this.font.lineHeight);
 
-        for (Component component : paragraphs) {
+        // 2. Process the amalgamated list into pages with a single, consistent logic.
+        List<PageLine> currentPage = new ArrayList<>();
+        int baseLineCount = Math.max(1, (PAGE_TEXT_HEIGHT - PAGE_BOTTOM_MARGIN) / this.font.lineHeight);
+        int maxLines = Math.max(1, baseLineCount - 1);
+
+        for (Component component : allParagraphs) {
+            // Handle empty components which represent blank lines.
             if (component.getString().isEmpty()) {
-                appendBlankLine(current, maxLines);
+                if (currentPage.size() >= maxLines) {
+                    pages.add(List.copyOf(currentPage));
+                    currentPage.clear();
+                }
+                currentPage.add(new PageLine(FormattedCharSequence.forward("", Style.EMPTY), BODY_TEXT_COLOR));
                 continue;
             }
 
-            for (FormattedCharSequence line : this.font.split(component, PAGE_TEXT_WIDTH)) {
-                current.add(line);
-                if (current.size() >= maxLines) {
-                    pages.add(List.copyOf(current));
-                    current.clear();
+            int color = getComponentColor(component, BODY_TEXT_COLOR);
+            List<FormattedCharSequence> lines = this.font.split(component, PAGE_TEXT_WIDTH);
+
+            // Add each line to the current page, creating a new page when full.
+            for (FormattedCharSequence line : lines) {
+                if (currentPage.size() >= maxLines) {
+                    pages.add(List.copyOf(currentPage));
+                    currentPage.clear();
                 }
+                currentPage.add(new PageLine(line, color));
             }
         }
 
-        if (!current.isEmpty()) {
-            pages.add(List.copyOf(current));
+        // 3. Add the final page if it has any content.
+        if (!currentPage.isEmpty()) {
+            pages.add(List.copyOf(currentPage));
         }
 
+        // 4. Ensure there's at least one page, even if empty.
         if (pages.isEmpty()) {
             pages.add(Collections.emptyList());
         }
 
         spreadIndex = Mth.clamp(spreadIndex, 0, getMaxSpreadIndex());
-    }
-
-    private void appendBlankLine(List<FormattedCharSequence> current, int maxLines) {
-        current.add(FormattedCharSequence.forward("", Style.EMPTY));
-        if (current.size() >= maxLines) {
-            pages.add(List.copyOf(current));
-            current.clear();
-        }
     }
 
     private void addMultilineParagraph(List<Component> paragraphs, String rawText, int color) {
@@ -367,8 +376,18 @@ public class ManualStudyScreen extends Screen {
 
         graphics.blit(BOOK_TEXTURE, bookLeft, bookTop, 0, 0, BOOK_WIDTH, BOOK_HEIGHT);
 
-        graphics.drawCenteredString(this.font, Component.translatable("screen.cultivatereg.manual.heading", manual.displayName()),
-                bookLeft + BOOK_WIDTH / 2, bookTop + 12, 0x3F3F3F);
+        // --- RENDER MULTI-LINE TITLE ---
+        Component title = Component.translatable("screen.cultivatereg.manual.heading", manual.displayName());
+        int titleMaxWidth = BOOK_WIDTH - 44; // Give 22px margin on each side to match page text
+        int bookCenterX = bookLeft + BOOK_WIDTH / 2;
+        int currentY = bookTop + 12;
+
+        for (FormattedCharSequence line : this.font.split(title, titleMaxWidth)) {
+            int lineWidth = this.font.width(line);
+            graphics.drawString(this.font, line, bookCenterX - lineWidth / 2, currentY, 0x3F3F3F, false);
+            currentY += this.font.lineHeight;
+        }
+        // --- END OF TITLE RENDER ---
 
         if (!manualStack.isEmpty()) {
             graphics.renderItem(manualStack, bookLeft + 8, bookTop + 8);
@@ -381,7 +400,7 @@ public class ManualStudyScreen extends Screen {
         }
 
         if (!feedback.getString().isEmpty()) {
-            graphics.drawCenteredString(this.font, feedback, this.width / 2, bookTop + BOOK_HEIGHT + 6, 0xFFFFFF);
+            drawCenteredComponent(graphics, feedback, this.width / 2, bookTop + BOOK_HEIGHT + 6, 0xFFFFFF);
         }
 
         super.render(graphics, mouseX, mouseY, partialTick);
@@ -396,7 +415,7 @@ public class ManualStudyScreen extends Screen {
 
         Component pageIndicator = Component.translatable("screen.cultivatereg.manual.page_indicator",
                 Math.min(leftIndex + 1, pages.size()), pages.size());
-        graphics.drawCenteredString(this.font, pageIndicator, bookLeft + BOOK_WIDTH / 2, bookTop + BOOK_HEIGHT - 18, PAGE_INDICATOR_COLOR);
+        drawCenteredComponent(graphics, pageIndicator, bookLeft + BOOK_WIDTH / 2, bookTop + BOOK_HEIGHT - 18, PAGE_INDICATOR_COLOR);
     }
 
     private void drawPage(GuiGraphics graphics, int x, int y, int pageIndex) {
@@ -405,8 +424,8 @@ public class ManualStudyScreen extends Screen {
         }
 
         int lineY = y;
-        for (FormattedCharSequence line : pages.get(pageIndex)) {
-            graphics.drawString(this.font, line, x, lineY, BODY_TEXT_COLOR);
+        for (PageLine line : pages.get(pageIndex)) {
+            graphics.drawString(this.font, line.text(), x, lineY, line.color(), false);
             lineY += this.font.lineHeight;
         }
     }
@@ -422,11 +441,11 @@ public class ManualStudyScreen extends Screen {
 
         graphics.drawString(this.font,
                 Component.translatable("screen.cultivatereg.manual.quiz_heading"),
-                promptX, promptY, QUIZ_HEADING_COLOR);
+                promptX, promptY, QUIZ_HEADING_COLOR, false);
 
         int y = promptY + this.font.lineHeight + 2;
         for (FormattedCharSequence line : this.font.split(Component.literal(question.prompt()), PAGE_TEXT_WIDTH)) {
-            graphics.drawString(this.font, line, promptX, y, QUIZ_TEXT_COLOR);
+            graphics.drawString(this.font, line, promptX, y, QUIZ_TEXT_COLOR, false);
             y += this.font.lineHeight;
         }
 
@@ -434,9 +453,23 @@ public class ManualStudyScreen extends Screen {
         Component prompt = Component.translatable("screen.cultivatereg.manual.quiz_prompt");
         int instructionY = promptY;
         for (FormattedCharSequence line : this.font.split(prompt, PAGE_TEXT_WIDTH)) {
-            graphics.drawString(this.font, line, instructionsX, instructionY, QUIZ_TEXT_COLOR);
+            graphics.drawString(this.font, line, instructionsX, instructionY, QUIZ_TEXT_COLOR, false);
             instructionY += this.font.lineHeight;
         }
+    }
+
+    private void drawCenteredComponent(GuiGraphics graphics, Component component, int centerX, int y, int fallbackColor) {
+        int color = getComponentColor(component, fallbackColor);
+        int x = centerX - this.font.width(component) / 2;
+        graphics.drawString(this.font, component, x, y, color, false);
+    }
+
+    private static int getComponentColor(Component component, int fallbackColor) {
+        var color = component.getStyle().getColor();
+        return color != null ? color.getValue() : fallbackColor;
+    }
+
+    private record PageLine(FormattedCharSequence text, int color) {
     }
 
     @Override
@@ -505,3 +538,4 @@ public class ManualStudyScreen extends Screen {
         }
     }
 }
+
