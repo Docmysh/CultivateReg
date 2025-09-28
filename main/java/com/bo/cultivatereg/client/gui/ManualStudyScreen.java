@@ -73,11 +73,11 @@ public class ManualStudyScreen extends Screen {
         this.beginButton = this.addRenderableWidget(Button.builder(
                         Component.translatable("screen.cultivatereg.manual.begin"),
                         b -> beginQuiz())
-                .pos(this.width / 2 - 90, this.height - 34)
-                .size(180, 20)
+                .pos(this.width / 2 - 75, this.height - 32)
+                .size(150, 18)
                 .build());
 
-        int baseY = this.height - 134;
+        int baseY = this.height - 126;
         for (int i = 0; i < 4; i++) {
             final int idx = i;
             Button button = this.addRenderableWidget(Button.builder(Component.literal(""),
@@ -194,8 +194,8 @@ public class ManualStudyScreen extends Screen {
 
         boolean askingQuestion = questionIndex >= 0 && questionIndex < manual.quiz().size();
 
-        int manualTop = headingY + 24;
-        int quizHeadingTop = this.height - 160;
+        int manualTop = headingY + 22;
+        int quizHeadingTop = this.height - 150;
         this.textAreaTop = askingQuestion ? 0 : manualTop;
         int calculatedHeight = quizHeadingTop - 12 - manualTop;
         this.textAreaHeight = askingQuestion ? 0 : Math.max(0, calculatedHeight);
@@ -231,7 +231,7 @@ public class ManualStudyScreen extends Screen {
 
         if (askingQuestion) {
             var question = manual.quiz().get(questionIndex);
-            int questionTop = this.height - 160;
+            int questionTop = this.height - 150;
             graphics.drawCenteredString(this.font,
                     Component.translatable("screen.cultivatereg.manual.quiz_heading"),
                     this.width / 2, questionTop, 0xFFD780);
@@ -243,7 +243,7 @@ public class ManualStudyScreen extends Screen {
         } else {
             graphics.drawCenteredString(this.font,
                     Component.translatable("screen.cultivatereg.manual.quiz_heading"),
-                    this.width / 2, this.height - 160, 0xFFD780);
+                    this.width / 2, this.height - 150, 0xFFD780);
         }
 
         if (!feedback.getString().isEmpty()) {
