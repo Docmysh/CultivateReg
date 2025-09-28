@@ -16,6 +16,8 @@ public enum Realm {
             "Mortal",
             0xFFC0C0C0,
             new float[]{0.60f, 0.60f, 0.60f},
+            0,
+            0,
             new int[0]
     ),
     QI_GATHERING(
@@ -24,6 +26,8 @@ public enum Realm {
             "Qi Gather",
             0xFF4FC3F7,
             new float[]{0.30f, 0.85f, 1.00f},
+            140,
+            25,
             new int[]{100, 180, 270, 380, 510, 660, 830, 1020, 1230}
     ),
     FOUNDATION(
@@ -32,6 +36,8 @@ public enum Realm {
             "Foundation",
             0xFFB388FF,
             new float[]{0.70f, 0.40f, 1.00f},
+            320,
+            40,
             new int[]{800, 1000, 1250, 1550, 1900, 2300, 2750, 3250, 3800}
     ),
     CORE_FORMATION(
@@ -40,6 +46,8 @@ public enum Realm {
             "Core Form",
             0xFFFFD54F,
             new float[]{1.00f, 0.85f, 0.20f},
+            600,
+            90,
             new int[]{3000, 3500, 4100, 4800, 5600, 6500, 7500, 8600, 9800}
     ),
     NASCENT_SOUL(
@@ -48,6 +56,8 @@ public enum Realm {
             "Nascent",
             0xFFFFA726,
             new float[]{1.00f, 0.55f, 0.25f},
+            800,
+            120,
             new int[]{13000, 14800, 16800, 19000, 21400, 24000, 26800, 29800, 33000}
     ),
     SOUL_TRANSFORMATION(
@@ -56,6 +66,8 @@ public enum Realm {
             "Soul Trans",
             0xFFFF7043,
             new float[]{0.95f, 0.35f, 0.40f},
+            1050,
+            150,
             new int[]{36000, 38600, 41400, 44400, 47600, 51000, 54600, 58400, 62400}
     ),
     SPIRIT_SEVERING(
@@ -64,6 +76,8 @@ public enum Realm {
             "Spirit Sev",
             0xFFE573AB,
             new float[]{0.90f, 0.30f, 0.60f},
+            1350,
+            180,
             new int[]{66000, 69300, 72800, 76500, 80400, 84500, 88800, 93300, 98000}
     ),
     VOID_REFINING(
@@ -72,6 +86,8 @@ public enum Realm {
             "Void Ref",
             0xFF64B5F6,
             new float[]{0.55f, 0.70f, 1.00f},
+            1700,
+            210,
             new int[]{103000, 107000, 111000, 115000, 119000, 123000, 127000, 131000, 135000}
     ),
     INTEGRATION(
@@ -80,6 +96,8 @@ public enum Realm {
             "Integration",
             0xFF26C6DA,
             new float[]{0.30f, 0.90f, 0.75f},
+            2100,
+            240,
             new int[]{140000, 145000, 150000, 155000, 160000, 165000, 170000, 175000, 180000}
     ),
     TRIBULATION(
@@ -88,6 +106,8 @@ public enum Realm {
             "Tribulation",
             0xFFF5F5F5,
             new float[]{0.95f, 0.95f, 1.00f},
+            2550,
+            270,
             new int[]{186000, 192000, 198000, 204000, 210000, 216000, 222000, 228000, 234000}
     );
 
@@ -100,14 +120,19 @@ public enum Realm {
     private final String shortName;
     private final int nameplateColor;
     private final float[] shieldColor;
+    private final int spiritBase;
+    private final int spiritPerStage;
     private final int[] stageCaps;
 
-    Realm(Tier tier, float baseRate, String shortName, int nameplateColor, float[] shieldColor, int[] stageCaps) {
+    Realm(Tier tier, float baseRate, String shortName, int nameplateColor,
+          float[] shieldColor, int spiritBase, int spiritPerStage, int[] stageCaps) {
         this.tier = tier;
         this.baseRate = baseRate;
         this.shortName = shortName;
         this.nameplateColor = nameplateColor;
         this.shieldColor = shieldColor.clone();
+        this.spiritBase = spiritBase;
+        this.spiritPerStage = spiritPerStage;
         this.stageCaps = stageCaps.clone();
     }
 
@@ -130,7 +155,10 @@ public enum Realm {
     }
 
     public int spiritCapForStage(int stage) {
-        return tier.spiritCapForStage(clampStage(stage));
+        if (this == MORTAL) return 0;
+        int s = clampStage(stage);
+        if (spiritPerStage <= 0) return Math.max(0, spiritBase);
+        return Math.max(0, spiritBase + spiritPerStage * (s - 1));
     }
 
     public float spiritRegenPerSecond() {
@@ -175,15 +203,13 @@ public enum Realm {
 
     private enum Tier {
         MORTAL(
-                0, 0,
                 0.0f, 0.5f,
                 0.0, 0.0,
                 1.00, 0.00,
                 PlayerScaling.ZERO, PlayerScaling.ZERO, PlayerScaling.ZERO, PlayerScaling.ZERO
         ),
         QI(
-                100, 15,
-                0.05f, 0.8f,
+                .05f, 0.8f,
                 2.0, 0.2,
                 1.20, 0.05,
                 new PlayerScaling(2.0, 2.0),
@@ -192,7 +218,6 @@ public enum Realm {
                 new PlayerScaling(0.02, 0.02)
         ),
         FOUNDATION(
-                200, 25,
                 0.06f, 1.2f,
                 6.0, 0.4,
                 1.80, 0.05,
@@ -202,7 +227,6 @@ public enum Realm {
                 new PlayerScaling(0.08, 0.03)
         ),
         CORE(
-                400, 50,
                 0.08f, 1.6f,
                 12.0, 0.6,
                 3.00, 0.05,
@@ -212,8 +236,6 @@ public enum Realm {
                 new PlayerScaling(0.15, 0.05)
         );
 
-        private final int spiritBase;
-        private final int spiritPerStage;
         private final float spiritRegenPerSecond;
         private final float healthRegenPerSecond;
         private final double mobArmorBase;
@@ -225,14 +247,11 @@ public enum Realm {
         private final PlayerScaling dmgAdd;
         private final PlayerScaling kbMul;
 
-        Tier(int spiritBase, int spiritPerStage,
-             float spiritRegenPerSecond, float healthRegenPerSecond,
+        Tier(float spiritRegenPerSecond, float healthRegenPerSecond,
              double mobArmorBase, double mobArmorPerStage,
              double mobPowerBase, double mobPowerStageBonus,
              PlayerScaling hpAdd, PlayerScaling speedMul,
              PlayerScaling dmgAdd, PlayerScaling kbMul) {
-            this.spiritBase = spiritBase;
-            this.spiritPerStage = spiritPerStage;
             this.spiritRegenPerSecond = spiritRegenPerSecond;
             this.healthRegenPerSecond = healthRegenPerSecond;
             this.mobArmorBase = mobArmorBase;
@@ -243,12 +262,6 @@ public enum Realm {
             this.speedMul = speedMul;
             this.dmgAdd = dmgAdd;
             this.kbMul = kbMul;
-        }
-
-        private int spiritCapForStage(int stage) {
-            if (stage <= 0) return 0;
-            if (spiritPerStage <= 0) return spiritBase;
-            return spiritBase + spiritPerStage * (stage - 1);
         }
 
         private double mobArmorBonus(int stage) {
@@ -276,12 +289,3 @@ public enum Realm {
 
     private record PlayerScaling(double base, double perStage) {
         static final PlayerScaling ZERO = new PlayerScaling(0.0, 0.0);
-
-        double value(int stage) {
-            if (stage <= 0) return 0.0;
-            return base + perStage * Math.max(0, stage - 1);
-        }
-    }
-
-    public record PlayerModifiers(double hpAdd, double speedMul, double dmgAdd, double kbMul) {}
-}

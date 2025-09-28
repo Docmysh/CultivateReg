@@ -23,6 +23,8 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = CultivateReg.MODID)
 public class MobCultivationEvents {
 
+    private static boolean IN_CUSTOM_EXPLOSION = false;
+
     @SubscribeEvent
     public static void onJoin(EntityJoinLevelEvent e) {
         if (e.getLevel().isClientSide()) return;
@@ -127,6 +129,8 @@ public class MobCultivationEvents {
      */
     @SubscribeEvent
     public static void onExplosionStart(ExplosionEvent.Start e) {
+        if (IN_CUSTOM_EXPLOSION) return;
+
         Level level = e.getLevel();
         if (level.isClientSide()) return;
 
@@ -144,12 +148,17 @@ public class MobCultivationEvents {
             // Replace the vanilla explosion with our own radius
             e.setCanceled(true);
             // Use MOB interaction (same as creeper), no fire by default; adjust if you want flaming blasts
-            level.explode(
-                    c,                      // source entity
-                    c.getX(), c.getY(), c.getZ(),
-                    radius,
-                    Level.ExplosionInteraction.MOB
-            );
+            try {
+                IN_CUSTOM_EXPLOSION = true;
+                level.explode(
+                        c,                      // source entity
+                        c.getX(), c.getY(), c.getZ(),
+                        radius,
+                        Level.ExplosionInteraction.MOB
+                );
+            } finally {
+                IN_CUSTOM_EXPLOSION = false;
+            }
             // Vanilla explodeCreeper() kills the creeper afterwards; mimic that.
             c.discard();
         });
