@@ -3,6 +3,7 @@ package com.bo.cultivatereg;
 import com.bo.cultivatereg.config.ModConfigs;
 import com.bo.cultivatereg.network.Net;
 import com.bo.cultivatereg.registry.ModEntities;
+import com.bo.cultivatereg.registry.ModEffects;
 import com.bo.cultivatereg.registry.ModSounds;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -23,8 +24,10 @@ public class CultivateReg {
         // mod event bus
         var modBus = FMLJavaModLoadingContext.get().getModEventBus();
         ModSounds.SOUND_EVENTS.register(modBus);
+        com.bo.cultivatereg.registry.ModBlocks.register(modBus);
         com.bo.cultivatereg.registry.ModItems.register(modBus);
         com.bo.cultivatereg.registry.ModLootModifiers.register(modBus);
-        ModEntities.register(modBus); // Updated call
+        ModEffects.register(modBus);
+        ModEntities.register(modBus);
     }
 }

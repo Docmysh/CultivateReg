@@ -2,7 +2,9 @@
 package com.bo.cultivatereg.client;
 
 import com.bo.cultivatereg.CultivateReg;
+import com.bo.cultivatereg.client.render.HomelessManRenderer;
 import com.bo.cultivatereg.item.SpiritStoneItem;
+import com.bo.cultivatereg.registry.ModEntities;
 import com.bo.cultivatereg.registry.ModItems;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -15,7 +17,7 @@ public class ClientSetup {
 
     @SubscribeEvent
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers e) {
-
+        e.registerEntityRenderer(ModEntities.HOMELESS_MAN.get(), HomelessManRenderer::new);
     }
 
     @SubscribeEvent

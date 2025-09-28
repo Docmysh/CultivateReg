@@ -23,7 +23,7 @@
   "screen.cultivatereg.manual.section.content": "Method",
   "screen.cultivatereg.manual.section.requirement": "Breakthrough Guidance",
   "screen.cultivatereg.manual.instructions": "Read carefully, then begin the comprehension test.",
-  "screen.cultivatereg.manual.instructions.no_quiz": "Read carefully—the knowledge seeps in as you finish each grimy page.",
+  "screen.cultivatereg.manual.instructions.no_quiz": "Knowledge hides behind each grimy page.",
   "screen.cultivatereg.manual.page_hint": "Use the arrows or A/D keys to turn the pages.",
   "screen.cultivatereg.manual.begin": "Begin Test",
   "screen.cultivatereg.manual.retake": "Retake Test",
@@ -34,6 +34,18 @@
   "screen.cultivatereg.manual.feedback.complete": "You fully comprehend %s!",
   "screen.cultivatereg.manual.already_mastered": "You have already mastered this manual.",
   "screen.cultivatereg.manual.final_prompt": "Turn to the last page when you are ready to take the comprehension test.",
-  "screen.cultivatereg.manual.page_indicator": "Page %s / %s"
+  "screen.cultivatereg.manual.page_indicator": "Page %s / %s",
+  "item.cultivatereg.booze": "Beggar's Brew",
+  "item.cultivatereg.booze.tooltip": "A suspicious drink brewed from whatever was lying around.",
+  "block.cultivatereg.dirty_trash_can": "Dirty Trash Can",
+  "entity.cultivatereg.homeless_man": "Mystic Beggar",
+  "message.cultivatereg.homeless_man.quest_start": "Bring me some booze and maybe I'll spill a secret or two...",
+  "message.cultivatereg.homeless_man.need_booze": "No booze, no secrets. It's that simple.",
+  "message.cultivatereg.homeless_man.quest_complete": "Alright kid, here's the filthy manual I promised.",
+  "message.cultivatereg.homeless_man.after_quest": "Go on, check my trash can if you dare.",
+  "message.cultivatereg.trash_can.too_foul": "You gag and back away—the beggar refuses to let you rummage yet.",
+  "message.cultivatereg.stank.cannot_eat": "You reek too badly to stomach anything. Wash up in water!",
+  "message.cultivatereg.stank.cleansed": "The stench washes away, letting you eat again.",
+  "effect.cultivatereg.stank": "Stank"
 
 }

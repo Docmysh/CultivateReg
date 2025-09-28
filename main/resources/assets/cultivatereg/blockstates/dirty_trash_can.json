@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "looted=false": { "model": "cultivatereg:block/dirty_trash_can" },
+    "looted=true": { "model": "cultivatereg:block/dirty_trash_can" }
+  }
+}

@@ -2,8 +2,11 @@ package com.bo.cultivatereg.registry;
 
 import com.bo.cultivatereg.CultivateReg;
 import com.bo.cultivatereg.item.BasicQiManualItem;
+import com.bo.cultivatereg.item.BoozeItem;
 import com.bo.cultivatereg.item.FilthyCultivationManualItem;
 import com.bo.cultivatereg.item.SpiritStoneItem;
+import com.bo.cultivatereg.registry.ModBlocks;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -31,7 +34,14 @@ public class ModItems {
 
     public static final RegistryObject<Item> BASIC_QI_MANUAL =
             ITEMS.register("basic_qi_manual", () -> new BasicQiManualItem(new Item.Properties().stacksTo(1)));
+
+    public static final RegistryObject<Item> BOOZE =
+            ITEMS.register("booze", () -> new BoozeItem(new Item.Properties().stacksTo(16)));
+
+    public static final RegistryObject<Item> DIRTY_TRASH_CAN_ITEM =
+            ITEMS.register("dirty_trash_can", () -> new BlockItem(ModBlocks.DIRTY_TRASH_CAN.get(), new Item.Properties()));
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
     }
+
 }

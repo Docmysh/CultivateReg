@@ -1,6 +1,8 @@
 package com.bo.cultivatereg.client;
 
 import com.bo.cultivatereg.CultivateReg;
+import com.bo.cultivatereg.cultivation.CultivationCapability;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
@@ -17,7 +19,19 @@ public final class HealthHudHandler {
     @SubscribeEvent
     public static void hideVanillaHearts(RenderGuiOverlayEvent.Pre event) {
         if (event.getOverlay() == VanillaGuiOverlay.PLAYER_HEALTH.type()) {
-            event.setCanceled(true);
+            var mc = Minecraft.getInstance();
+            var player = mc.player;
+            if (player == null) {
+                return;
+            }
+
+            boolean hideHearts = player.getCapability(CultivationCapability.CULTIVATION_CAP)
+                    .map(data -> data.isCultivationUnlocked())
+                    .orElse(false);
+
+            if (hideHearts) {
+                event.setCanceled(true);
+            }
         }
     }
 }
