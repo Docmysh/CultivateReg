@@ -17,6 +17,7 @@ public record StartQiSightPacket() {
             var sp = c.getSender();
             if (sp == null) return;
             sp.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(d -> {
+                if (!d.isCultivationUnlocked()) return;
                 if (d.hasSensed()) d.setQiSight(true); // gate by having unlocked “Sense”
             });
         });

@@ -24,6 +24,7 @@ public record SenseAttemptPacket(int meridianIndex) {
             if (sp == null) return;
 
             sp.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent((CultivationData d) -> {
+                if (!d.isCultivationUnlocked()) return;
                 if (!d.isMeditating()) return;
 
                 final int idx = Math.max(0, Math.min(CultivationData.MERIDIANS - 1, pkt.meridianIndex()));

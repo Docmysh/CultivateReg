@@ -17,6 +17,7 @@ public record StartFlightPacket() {
             ServerPlayer sp = c.getSender();
             if (sp == null) return;
             sp.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(data -> {
+                if (!data.isCultivationUnlocked()) return;
                 if (data.getRealm().ordinal() >= Realm.FOUNDATION.ordinal() && data.getSpirit() > 0f) {
                     data.setMeditating(false);
                     data.setResting(false);

@@ -15,6 +15,53 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class CultivationManuals {
     private static final Map<ResourceLocation, CultivationManual> REGISTRY = new ConcurrentHashMap<>();
 
+    public static final CultivationManual FILTHY_BEGGAR_PRIMER = register(
+            new CultivationManual(
+                    ResourceLocation.fromNamespaceAndPath(CultivateReg.MODID, "manual/filthy_beggar_primer"),
+                    "I Wanted to Cultivate to Immortality, Yet Somehow Ended Up With Nothing But a Filthy Book From Some Homeless Guy",
+                    "A stained primer that crudely sketches how mortals might pry open their first meridians.",
+                    """
+                    The Twelve Locks
+
+                    There are twelve locks, each deeper than the last, each refusing entry until something is given.
+                    Not all are needed—only three. Is there a need for more?
+
+                    The first three will open with what drops from the broken.
+                    The ones who arise at night.
+                    Three stones. One for each gate.
+
+                    The next three are bound in violet.
+                    They do not rise, but hide.
+                    Purple. Pulled from the below.
+                    Three is enough.
+
+                    Then comes the rest.
+                    They do not like to be seen.
+                    You will need the pearls of the tall ones, afraid of water.
+                    Gather three. Don’t ask. Don’t look them in the eye.
+
+                    The final three doors are old and cruel.
+                    Three skulls, black as dried oil.
+                    Put together again. Three times three. Nine in total.
+                    Each of the three roar once more.
+                    Now you must put them to rest.
+
+                    Only then will the path open all the way through.
+                    Only then will breath not escape you.
+
+                    And when the locks are done, when you think the way is clear—
+                    remember where I pissed.
+                    Dive through the filth where the stream runs yellow.
+                    There, beneath the stench, the last key waits.
+                    """,
+                    "Reading this foul manual unlocks your ability to perceive cultivation and begin opening meridians, though its guidance is maddeningly vague.",
+                    Realm.MORTAL,
+                    Realm.QI_GATHERING,
+                    3,
+                    List.of()
+            )
+    );
+
     public static final CultivationManual BASIC_QI_GATHERING = register(
             new CultivationManual(
                     ResourceLocation.fromNamespaceAndPath(CultivateReg.MODID, "manual/basic_qi_gathering"),
@@ -74,7 +121,7 @@ public final class CultivationManuals {
     }
 
     public static CultivationManual byId(ResourceLocation id) {
-        return REGISTRY.getOrDefault(id, BASIC_QI_GATHERING);
+        return REGISTRY.getOrDefault(id, FILTHY_BEGGAR_PRIMER);
     }
 
     public static boolean exists(ResourceLocation id) {

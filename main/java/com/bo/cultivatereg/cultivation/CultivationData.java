@@ -14,6 +14,10 @@ public interface CultivationData {
     boolean isMeditating();
     void setMeditating(boolean v);
 
+    /** Whether the player has unlocked the cultivation interface/knowledge. */
+    boolean isCultivationUnlocked();
+    void setCultivationUnlocked(boolean v);
+
     boolean hasSensed();      // mortal → first unlock flag
     void setSensed(boolean v);
 

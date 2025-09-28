@@ -12,7 +12,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class Net {
-    private static final String PROTO = "7";
+    private static final String PROTO = "8";
     public static SimpleChannel CHANNEL;
 
     /** Call this once during common setup (you likely already do). */
@@ -76,6 +76,7 @@ public class Net {
                         data.getStage(),
                         data.getQi(),
                         data.isMeditating(),
+                        data.isCultivationUnlocked(),
                         data.hasSensed(),
                         data.getSenseProgress(),
                         data.getSpirit(),

@@ -97,7 +97,10 @@ public class ManualStudyScreen extends Screen {
         if (mc.player != null) {
             mc.player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(data -> {
                 alreadyMastered = data.isManualQuizPassed() && manual.id().equals(data.getManualId());
-                if (alreadyMastered) {
+                if (!alreadyMastered && manual.quiz().isEmpty() && data.isCultivationUnlocked()) {
+                    alreadyMastered = true;
+                }
+                if (alreadyMastered || manual.quiz().isEmpty()) {
                     completionSent = true;
                 }
             });
@@ -167,7 +170,9 @@ public class ManualStudyScreen extends Screen {
 
         Component intro = alreadyMastered
                 ? Component.translatable("screen.cultivatereg.manual.already_mastered").withStyle(s -> s.withColor(0x55FFFF))
-                : Component.translatable("screen.cultivatereg.manual.instructions").withStyle(s -> s.withColor(INSTRUCTION_TEXT_COLOR));
+                : (manual.quiz().isEmpty()
+                ? Component.translatable("screen.cultivatereg.manual.instructions.no_quiz").withStyle(s -> s.withColor(INSTRUCTION_TEXT_COLOR))
+                : Component.translatable("screen.cultivatereg.manual.instructions").withStyle(s -> s.withColor(INSTRUCTION_TEXT_COLOR)));
         allParagraphs.add(intro);
         allParagraphs.add(Component.translatable("screen.cultivatereg.manual.page_hint").withStyle(s -> s.withColor(PAGE_HINT_COLOR)));
         allParagraphs.add(Component.empty());
@@ -192,9 +197,11 @@ public class ManualStudyScreen extends Screen {
         addMultilineParagraph(allParagraphs, manual.breakthroughRequirement(), BODY_TEXT_COLOR);
         allParagraphs.add(Component.empty());
 
-        allParagraphs.add(Component.translatable("screen.cultivatereg.manual.final_prompt")
-                .withStyle(style -> style.withColor(FINAL_PROMPT_COLOR)));
-        allParagraphs.add(Component.empty());
+        if (!manual.quiz().isEmpty()) {
+            allParagraphs.add(Component.translatable("screen.cultivatereg.manual.final_prompt")
+                    .withStyle(style -> style.withColor(FINAL_PROMPT_COLOR)));
+            allParagraphs.add(Component.empty());
+        }
 
 
         // 2. Process the amalgamated list into pages with a single, consistent logic.
@@ -359,8 +366,9 @@ public class ManualStudyScreen extends Screen {
             } else {
                 beginButton.setMessage(Component.translatable("screen.cultivatereg.manual.begin"));
             }
-            beginButton.visible = reading && spreadIndex >= maxSpread;
-            beginButton.active = beginButton.visible;
+            boolean showButton = !manual.quiz().isEmpty() && reading && spreadIndex >= maxSpread;
+            beginButton.visible = showButton;
+            beginButton.active = showButton;
         }
 
         if (!reading) {

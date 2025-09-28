@@ -19,6 +19,9 @@ public class HudOverlay {
         if (mc.player == null) return;
 
         mc.player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(data -> {
+            if (!data.isCultivationUnlocked()) {
+                return;
+            }
             int x = 8, y = 8;
             String realmLine;
             String qiLine;

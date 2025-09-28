@@ -38,6 +38,7 @@ public class CultivationCapability {
             tag.putInt("stage", backend.getStage());
             tag.putFloat("qi", backend.getQi());
             tag.putBoolean("med", backend.isMeditating());
+            tag.putBoolean("cultivationUnlocked", backend.isCultivationUnlocked());
             tag.putBoolean("sensed", backend.hasSensed());
             tag.putFloat("sensep", backend.getSenseProgress());
             tag.putFloat("spirit", backend.getSpirit()); // combat pool
@@ -68,6 +69,7 @@ public class CultivationCapability {
             backend.setStage(tag.getInt("stage"));
             backend.setQi(tag.getFloat("qi"));
             backend.setMeditating(false); // never load as actively meditating
+            backend.setCultivationUnlocked(tag.getBoolean("cultivationUnlocked"));
             backend.setSensed(tag.getBoolean("sensed"));
             backend.setSenseProgress(tag.getFloat("sensep"));
             backend.setSpirit(tag.contains("spirit") ? tag.getFloat("spirit") : 0f);
@@ -105,6 +107,7 @@ public class CultivationCapability {
                 newCap.setRealm(oldCap.getRealm());
                 newCap.setStage(oldCap.getStage());
                 newCap.setQi(oldCap.getQi());
+                newCap.setCultivationUnlocked(oldCap.isCultivationUnlocked());
                 newCap.setSensed(oldCap.hasSensed());
                 newCap.setSenseProgress(oldCap.getSenseProgress());
                 newCap.setSpirit(oldCap.getSpirit()); // carry over combat pool
