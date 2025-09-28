@@ -39,7 +39,7 @@ public final class CultivationManuals {
                                             "TLDR",
                                             "Cultivation bs"
                                     ),
-                                    Set.of(0, 4)
+                                    Set.of(0, 3)
                             ),
                             new ManualQuestion(
                                     "How should Qi be guided through the body?",
@@ -49,7 +49,7 @@ public final class CultivationManuals {
                                             "Js do it",
                                             "Cultivation bs?"
                                     ),
-                                    Set.of(0, 4)
+                                    Set.of(0, 3)
                             ),
                             new ManualQuestion(
                                     "What danger comes from forcing Qi through unopened meridians?",
@@ -59,7 +59,7 @@ public final class CultivationManuals {
                                             "TLDR",
                                             "Nothing cause cultivation bs"
                                     ),
-                                    Set.of(0, 4)
+                                    Set.of(0, 3)
                             )
                     )
             )
