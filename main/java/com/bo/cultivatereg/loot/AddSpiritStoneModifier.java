@@ -45,15 +45,39 @@ public class AddSpiritStoneModifier extends LootModifier {
                     .and(TierEntry.CODEC.fieldOf("mid").forGetter(m -> m.mid))
                     .and(TierEntry.CODEC.fieldOf("high").forGetter(m -> m.high))
                     .and(TierEntry.CODEC.fieldOf("top").forGetter(m -> m.top))
-                    .and(TierEntry.CODEC.optionalFieldOf("nascent").forGetter(m -> Optional.ofNullable(m.nascent)))
-                    .and(TierEntry.CODEC.optionalFieldOf("soul").forGetter(m -> Optional.ofNullable(m.soul)))
-                    .and(TierEntry.CODEC.optionalFieldOf("spirit").forGetter(m -> Optional.ofNullable(m.spirit)))
-                    .and(TierEntry.CODEC.optionalFieldOf("void").forGetter(m -> Optional.ofNullable(m.voidRefining)))
-                    .and(TierEntry.CODEC.optionalFieldOf("integration").forGetter(m -> Optional.ofNullable(m.integration)))
-                    .and(TierEntry.CODEC.optionalFieldOf("tribulation").forGetter(m -> Optional.ofNullable(m.tribulation)))
-                    .and(Codec.FLOAT.optionalFieldOf("core_top_chance", 0.05f).forGetter(m -> m.coreTopChance))
+                    .and(TierEntry.CODEC.optionalFieldOf("nascent").forGetter(AddSpiritStoneModifier::optionalNascent))
+                    .and(TierEntry.CODEC.optionalFieldOf("soul").forGetter(AddSpiritStoneModifier::optionalSoul))
+                    .and(TierEntry.CODEC.optionalFieldOf("spirit").forGetter(AddSpiritStoneModifier::optionalSpirit))
+                    .and(TierEntry.CODEC.optionalFieldOf("void").forGetter(AddSpiritStoneModifier::optionalVoidRefining))
+                    .and(TierEntry.CODEC.optionalFieldOf("integration").forGetter(AddSpiritStoneModifier::optionalIntegration))
+                    .and(TierEntry.CODEC.optionalFieldOf("tribulation").forGetter(AddSpiritStoneModifier::optionalTribulation))
                     .apply(inst, AddSpiritStoneModifier::new)
     );
+
+    private Optional<TierEntry> optionalNascent() {
+        return Optional.ofNullable(nascent);
+    }
+
+    private Optional<TierEntry> optionalSoul() {
+        return Optional.ofNullable(soul);
+    }
+
+    private Optional<TierEntry> optionalSpirit() {
+        return Optional.ofNullable(spirit);
+    }
+
+    private Optional<TierEntry> optionalVoidRefining() {
+        return Optional.ofNullable(voidRefining);
+    }
+
+    private Optional<TierEntry> optionalIntegration() {
+        return Optional.ofNullable(integration);
+    }
+
+    private Optional<TierEntry> optionalTribulation() {
+        return Optional.ofNullable(tribulation);
+    }
+
 
     protected AddSpiritStoneModifier(
             LootItemCondition[] conditions,
