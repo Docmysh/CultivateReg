@@ -16,9 +16,9 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.common.loot.LootModifier;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 public class AddSpiritStoneModifier extends LootModifier {
     public record TierEntry(Item item, int count) {
@@ -27,6 +27,23 @@ public class AddSpiritStoneModifier extends LootModifier {
                 Codec.INT.fieldOf("count").forGetter(TierEntry::count)
         ).apply(inst, TierEntry::new));
     }
+
+    public static final Codec<AddSpiritStoneModifier> CODEC = RecordCodecBuilder.create(inst ->
+            inst.group(
+                    LootModifier.codecStart(inst),
+                    TierEntry.CODEC.fieldOf("low").forGetter(m -> m.low),
+                    TierEntry.CODEC.fieldOf("mid").forGetter(m -> m.mid),
+                    TierEntry.CODEC.fieldOf("high").forGetter(m -> m.high),
+                    TierEntry.CODEC.fieldOf("top").forGetter(m -> m.top),
+                    TierEntry.CODEC.optionalFieldOf("nascent").forGetter(AddSpiritStoneModifier::optionalNascent),
+                    TierEntry.CODEC.optionalFieldOf("soul").forGetter(AddSpiritStoneModifier::optionalSoul),
+                    TierEntry.CODEC.optionalFieldOf("spirit").forGetter(AddSpiritStoneModifier::optionalSpirit),
+                    TierEntry.CODEC.optionalFieldOf("void_refining").forGetter(AddSpiritStoneModifier::optionalVoidRefining),
+                    TierEntry.CODEC.optionalFieldOf("integration").forGetter(AddSpiritStoneModifier::optionalIntegration),
+                    TierEntry.CODEC.optionalFieldOf("tribulation").forGetter(AddSpiritStoneModifier::optionalTribulation),
+                    Codec.FLOAT.fieldOf("core_top_chance").forGetter(m -> m.coreTopChance)
+            ).apply(inst, AddSpiritStoneModifier::new)
+    );
 
     private final TierEntry low;
     private final TierEntry mid;
@@ -39,49 +56,6 @@ public class AddSpiritStoneModifier extends LootModifier {
     private final TierEntry integration;
     private final TierEntry tribulation;
     private final float coreTopChance;
-
-    private static final Function<AddSpiritStoneModifier, Optional<TierEntry>> VOID_REFINING_GETTER =
-            (AddSpiritStoneModifier modifier) -> modifier.optionalVoidRefining();
-
-    public static final Codec<AddSpiritStoneModifier> CODEC = RecordCodecBuilder.create(inst ->
-            LootModifier.codecStart(inst)
-                    .and(TierEntry.CODEC.fieldOf("low").forGetter(m -> m.low))
-                    .and(TierEntry.CODEC.fieldOf("mid").forGetter(m -> m.mid))
-                    .and(TierEntry.CODEC.fieldOf("high").forGetter(m -> m.high))
-                    .and(TierEntry.CODEC.fieldOf("top").forGetter(m -> m.top))
-                    .and(TierEntry.CODEC.optionalFieldOf("nascent").forGetter(AddSpiritStoneModifier::optionalNascent))
-                    .and(TierEntry.CODEC.optionalFieldOf("soul").forGetter(AddSpiritStoneModifier::optionalSoul))
-                    .and(TierEntry.CODEC.optionalFieldOf("spirit").forGetter(AddSpiritStoneModifier::optionalSpirit))
-                    .t4(TierEntry.CODEC.optionalFieldOf("void").forGetter(VOID_REFINING_GETTER))
-                    .t4(TierEntry.CODEC.optionalFieldOf("integration").forGetter(AddSpiritStoneModifier::optionalIntegration))
-                    .t4(TierEntry.CODEC.optionalFieldOf("tribulation").forGetter(AddSpiritStoneModifier::optionalTribulation))
-                    .apply(inst, AddSpiritStoneModifier::new)
-    );
-
-    private Optional<TierEntry> optionalNascent() {
-        return Optional.ofNullable(nascent);
-    }
-
-    private Optional<TierEntry> optionalSoul() {
-        return Optional.ofNullable(soul);
-    }
-
-    private Optional<TierEntry> optionalSpirit() {
-        return Optional.ofNullable(spirit);
-    }
-
-    private Optional<TierEntry> optionalVoidRefining() {
-        return Optional.ofNullable(voidRefining);
-    }
-
-    private Optional<TierEntry> optionalIntegration() {
-        return Optional.ofNullable(integration);
-    }
-
-    private Optional<TierEntry> optionalTribulation() {
-        return Optional.ofNullable(tribulation);
-    }
-
 
     protected AddSpiritStoneModifier(
             LootItemCondition[] conditions,
@@ -97,87 +71,114 @@ public class AddSpiritStoneModifier extends LootModifier {
             Optional<TierEntry> tribulation,
             float coreTopChance
     ) {
-            super(conditions);
-            this.low = low;
-            this.mid = mid;
-            this.high = high;
-            this.top = top;
+        super(conditions);
+        this.low = low;
+        this.mid = mid;
+        this.high = high;
+        this.top = top;
         this.nascent = nascent.orElse(null);
         this.soul = soul.orElse(null);
         this.spirit = spirit.orElse(null);
         this.voidRefining = voidRefining.orElse(null);
         this.integration = integration.orElse(null);
         this.tribulation = tribulation.orElse(null);
-            this.coreTopChance = Math.max(0.0f, coreTopChance);
+        this.coreTopChance = Math.max(0.0f, coreTopChance);
+    }
+
+    @Override
+    protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext ctx) {
+        Entity entity = ctx.getParamOrNull(LootContextParams.THIS_ENTITY);
+        if (!(entity instanceof LivingEntity living)) {
+            addIfPresent(generatedLoot, low);
+            return generatedLoot;
         }
 
-        @Override
-        protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext ctx) {
-            Entity entity = ctx.getParamOrNull(LootContextParams.THIS_ENTITY);
-            if (!(entity instanceof LivingEntity living)) {
-                addIfPresent(generatedLoot, low);
-                return generatedLoot;
-            }
+        Optional<MobCultivationData> dataOpt = living.getCapability(MobCultivationCapability.CAP).resolve();
+        if (dataOpt.isEmpty() || !dataOpt.get().hasCultivation()) {
+            addIfPresent(generatedLoot, low);
+            return generatedLoot;
+        }
 
-            Optional<MobCultivationData> dataOpt = living.getCapability(MobCultivationCapability.CAP).resolve();
-            if (dataOpt.isEmpty() || !dataOpt.get().hasCultivation()) {
-                addIfPresent(generatedLoot, low);
-                return generatedLoot;
-            }
+        MobCultivationData data = dataOpt.get();
+        Realm realm = data.getRealm();
 
-            MobCultivationData data = dataOpt.get();
-            Realm realm = data.getRealm();
-
-            if (realm == Realm.FOUNDATION) {
-                addIfPresent(generatedLoot, mid);
-            } else if (realm == Realm.CORE_FORMATION) {
+        switch (realm) {
+            case FOUNDATION -> addIfPresent(generatedLoot, mid);
+            case CORE_FORMATION -> {
                 addIfPresent(generatedLoot, high);
                 if (coreTopChance > 0f && ctx.getRandom().nextFloat() < coreTopChance) {
                     addIfPresent(generatedLoot, top);
                 }
-            } else if (realm == Realm.NASCENT_SOUL) {
+            }
+            case NASCENT_SOUL -> {
                 if (!addIfPresent(generatedLoot, nascent)) {
                     addIfPresent(generatedLoot, top);
                 }
-            } else if (realm == Realm.SOUL_TRANSFORMATION) {
+            }
+            case SOUL_TRANSFORMATION -> {
                 if (!addIfPresent(generatedLoot, soul)) {
                     addIfPresent(generatedLoot, nascent);
                 }
-            } else if (realm == Realm.SPIRIT_SEVERING) {
+            }
+            case SPIRIT_SEVERING -> {
                 if (!addIfPresent(generatedLoot, spirit)) {
                     addIfPresent(generatedLoot, soul);
                 }
-            } else if (realm == Realm.VOID_REFINING) {
+            }
+            case VOID_REFINING -> {
                 if (!addIfPresent(generatedLoot, voidRefining)) {
                     addIfPresent(generatedLoot, spirit);
                 }
-            } else if (realm == Realm.INTEGRATION) {
+            }
+            case INTEGRATION -> {
                 if (!addIfPresent(generatedLoot, integration)) {
                     addIfPresent(generatedLoot, voidRefining);
                 }
-            } else if (realm == Realm.TRIBULATION) {
+            }
+            case TRIBULATION -> {
                 if (!addIfPresent(generatedLoot, tribulation)) {
                     addIfPresent(generatedLoot, integration);
                 }
-            } else {
-                // Qi Gathering or anything else defaults to low tier
-                addIfPresent(generatedLoot, low);
             }
-
-            return generatedLoot;
+            default -> // Qi Gathering or anything else defaults to low tier
+                    addIfPresent(generatedLoot, low);
         }
+
+        return generatedLoot;
+    }
 
     private static boolean addIfPresent(ObjectArrayList<ItemStack> generatedLoot, TierEntry entry) {
         if (entry == null) return false;
-            Item item = entry.item();
-            int count = entry.count();
+        Item item = entry.item();
+        int count = entry.count();
         if (item == null || count <= 0) return false;
-            generatedLoot.add(new ItemStack(item, count));
+        generatedLoot.add(new ItemStack(item, count));
         return true;
-        }
-
-        @Override
-        public Codec<? extends IGlobalLootModifier> codec() {
-            return CODEC;
-        }
     }
+
+    @Override
+    public Codec<? extends IGlobalLootModifier> codec() {
+        return CODEC;
+    }
+
+    // Helper methods for codec getters
+    private Optional<TierEntry> optionalNascent() {
+        return Optional.ofNullable(nascent);
+    }
+    private Optional<TierEntry> optionalSoul() {
+        return Optional.ofNullable(soul);
+    }
+    private Optional<TierEntry> optionalSpirit() {
+        return Optional.ofNullable(spirit);
+    }
+    private Optional<TierEntry> optionalVoidRefining() {
+        return Optional.ofNullable(voidRefining);
+    }
+    private Optional<TierEntry> optionalIntegration() {
+        return Optional.ofNullable(integration);
+    }
+    private Optional<TierEntry> optionalTribulation() {
+        return Optional.ofNullable(tribulation);
+    }
+}
+
