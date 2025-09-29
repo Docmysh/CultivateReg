@@ -6,6 +6,7 @@ import com.bo.cultivatereg.registry.ModBlocks;
 import com.bo.cultivatereg.registry.ModEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
@@ -43,7 +44,7 @@ public class HomelessManSpawner {
 
     private static void attemptVillageSpawn(ServerLevel level, BlockPos near) {
         PoiManager manager = level.getPoiManager();
-        Predicate<PoiType> predicate = type -> type.is(PoiTypes.MEETING);
+        Predicate<Holder<PoiType>> predicate = holder -> holder.is(PoiTypes.MEETING);
         try (Stream<PoiRecord> stream = manager.getInRange(predicate, near, 64, PoiManager.Occupancy.ANY)) {
             stream.forEach(record -> trySpawnAt(level, record.getPos()));
         }
@@ -94,7 +95,7 @@ public class HomelessManSpawner {
     }
 
     private static BlockPos findGround(ServerLevel level, BlockPos origin) {
-        Random random = level.random;
+        RandomSource random = level.getRandom();
         for (int attempts = 0; attempts < 10; attempts++) {
             int dx = random.nextInt(11) - 5;
             int dz = random.nextInt(11) - 5;
