@@ -58,6 +58,7 @@
   "message.cultivatereg.stank.cannot_eat": "You reek too badly to stomach anything. Wash up in water!",
   "message.cultivatereg.stank.cleansed": "The stench washes away, letting you eat again.",
   "message.cultivatereg.spirit_stone.need_meditate": "You must be meditating to channel a spirit stone.",
+  "message.cultivatereg.spirit_stone.overload": "Your body could not contain all the energy within the stone.",
   "effect.cultivatereg.stank": "Stank",
   "effect.cultivatereg.gross_hands": "#$%$ on My Hand"
 
