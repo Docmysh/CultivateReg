@@ -106,7 +106,7 @@ public class HomelessManEntity extends PathfinderMob {
     }
 
     private boolean isValidGreetingTarget(ServerPlayer player) {
-        return player.isAlive() && !player.isSpectator() && !player.isRemoved() && !player.isInvisibleTo(this);
+        return player.isAlive() && !player.isSpectator() && !player.isRemoved() && !player.isInvisible();
     }
 
     // -------------------- INTERACTION -------------------- //
@@ -125,7 +125,7 @@ public class HomelessManEntity extends PathfinderMob {
             return InteractionResult.SUCCESS;
         } else if (!this.isQuestComplete()) {
             // Assuming ModItems.TRASH is your quest item
-            if (stack.is(ModItems.booze)) {
+            if (stack.is(ModItems.BOOZE.get())) {
                 this.setQuestComplete(true);
                 player.displayClientMessage(Component.translatable("message.cultivatereg.homeless_man.quest_complete"), true);
                 if (!player.getAbilities().instabuild) {
@@ -193,6 +193,23 @@ public class HomelessManEntity extends PathfinderMob {
         this.entityData.set(QUEST_COMPLETE, complete);
     }
 
+    public void setTrashCanPos(@Nullable BlockPos pos) {
+        this.trashCanPos = pos;
+    }
+
+    @Nullable
+    public BlockPos getTrashCanPos() {
+        return this.trashCanPos;
+    }
+
+    public void setVillageCenter(@Nullable BlockPos pos) {
+        this.villageCenter = pos;
+    }
+
+    @Nullable
+    public BlockPos getVillageCenter() {
+        return this.villageCenter;
+    }
     // -------------------- SOUNDS & PHYSICS -------------------- //
 
     @Override
