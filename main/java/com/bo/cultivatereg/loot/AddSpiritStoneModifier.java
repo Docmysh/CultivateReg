@@ -48,9 +48,9 @@ public class AddSpiritStoneModifier extends LootModifier {
                     .and(TierEntry.CODEC.optionalFieldOf("nascent").forGetter(AddSpiritStoneModifier::optionalNascent))
                     .and(TierEntry.CODEC.optionalFieldOf("soul").forGetter(AddSpiritStoneModifier::optionalSoul))
                     .and(TierEntry.CODEC.optionalFieldOf("spirit").forGetter(AddSpiritStoneModifier::optionalSpirit))
-                    .and(TierEntry.CODEC.optionalFieldOf("void").forGetter(AddSpiritStoneModifier::optionalVoidRefining))
-                    .and(TierEntry.CODEC.optionalFieldOf("integration").forGetter(AddSpiritStoneModifier::optionalIntegration))
-                    .and(TierEntry.CODEC.optionalFieldOf("tribulation").forGetter(AddSpiritStoneModifier::optionalTribulation))
+                    .t4(TierEntry.CODEC.optionalFieldOf("void").forGetter(AddSpiritStoneModifier::optionalVoidRefining))
+                    .t4(TierEntry.CODEC.optionalFieldOf("integration").forGetter(AddSpiritStoneModifier::optionalIntegration))
+                    .t4(TierEntry.CODEC.optionalFieldOf("tribulation").forGetter(AddSpiritStoneModifier::optionalTribulation))
                     .apply(inst, AddSpiritStoneModifier::new)
     );
 
