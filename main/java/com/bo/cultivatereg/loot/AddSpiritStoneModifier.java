@@ -28,21 +28,49 @@ public class AddSpiritStoneModifier extends LootModifier {
         ).apply(inst, TierEntry::new));
     }
 
+    private record ModifierSettings(
+            TierEntry low,
+            TierEntry mid,
+            TierEntry high,
+            TierEntry top,
+            Optional<TierEntry> nascent,
+            Optional<TierEntry> soul,
+            Optional<TierEntry> spirit,
+            Optional<TierEntry> voidRefining,
+            Optional<TierEntry> integration,
+            Optional<TierEntry> tribulation,
+            float coreTopChance
+    ) {
+    }
     public static final Codec<AddSpiritStoneModifier> CODEC = RecordCodecBuilder.create(inst ->
-            inst.group(
-                    LootModifier.codecStart(inst),
-                    TierEntry.CODEC.fieldOf("low").forGetter(AddSpiritStoneModifier::lowEntry),
-                    TierEntry.CODEC.fieldOf("mid").forGetter(AddSpiritStoneModifier::midEntry),
-                    TierEntry.CODEC.fieldOf("high").forGetter(AddSpiritStoneModifier::highEntry),
-                    TierEntry.CODEC.fieldOf("top").forGetter(AddSpiritStoneModifier::topEntry),
-                    TierEntry.CODEC.optionalFieldOf("nascent").forGetter(AddSpiritStoneModifier::optionalNascent),
-                    TierEntry.CODEC.optionalFieldOf("soul").forGetter(AddSpiritStoneModifier::optionalSoul),
-                    TierEntry.CODEC.optionalFieldOf("spirit").forGetter(AddSpiritStoneModifier::optionalSpirit),
-                    TierEntry.CODEC.optionalFieldOf("void_refining").forGetter(AddSpiritStoneModifier::optionalVoidRefining),
-                    TierEntry.CODEC.optionalFieldOf("integration").forGetter(AddSpiritStoneModifier::optionalIntegration),
-                    TierEntry.CODEC.optionalFieldOf("tribulation").forGetter(AddSpiritStoneModifier::optionalTribulation),
-                    Codec.FLOAT.fieldOf("core_top_chance").forGetter(AddSpiritStoneModifier::coreTopChance)
-            ).apply(inst, AddSpiritStoneModifier::new)
+            LootModifier.codecStart(inst)
+                    .and(inst.group(
+                            TierEntry.CODEC.fieldOf("low").forGetter(AddSpiritStoneModifier::lowEntry),
+                            TierEntry.CODEC.fieldOf("mid").forGetter(AddSpiritStoneModifier::midEntry),
+                            TierEntry.CODEC.fieldOf("high").forGetter(AddSpiritStoneModifier::highEntry),
+                            TierEntry.CODEC.fieldOf("top").forGetter(AddSpiritStoneModifier::topEntry),
+                            TierEntry.CODEC.optionalFieldOf("nascent").forGetter(AddSpiritStoneModifier::optionalNascent),
+                            TierEntry.CODEC.optionalFieldOf("soul").forGetter(AddSpiritStoneModifier::optionalSoul),
+                            TierEntry.CODEC.optionalFieldOf("spirit").forGetter(AddSpiritStoneModifier::optionalSpirit),
+                            TierEntry.CODEC.optionalFieldOf("void_refining").forGetter(AddSpiritStoneModifier::optionalVoidRefining),
+                            TierEntry.CODEC.optionalFieldOf("integration").forGetter(AddSpiritStoneModifier::optionalIntegration),
+                            TierEntry.CODEC.optionalFieldOf("tribulation").forGetter(AddSpiritStoneModifier::optionalTribulation),
+                            Codec.FLOAT.fieldOf("core_top_chance").forGetter(AddSpiritStoneModifier::coreTopChance)
+                    ).apply(inst, ModifierSettings::new))
+                    .apply(inst, (conditions, settings) -> new AddSpiritStoneModifier(
+                            conditions,
+                            settings.low(),
+                            settings.mid(),
+                            settings.high(),
+                            settings.top(),
+                            settings.nascent(),
+                            settings.soul(),
+                            settings.spirit(),
+                            settings.voidRefining(),
+                            settings.integration(),
+                            settings.tribulation(),
+                            settings.coreTopChance()
+                    ))
     );
 
     private final TierEntry low;

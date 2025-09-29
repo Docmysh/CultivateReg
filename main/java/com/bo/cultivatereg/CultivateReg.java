@@ -19,13 +19,13 @@ public class CultivateReg {
 
     public CultivateReg() {
         // config
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ModConfigs.SPEC);
+        ModLoadingContext.registerConfig(ModConfig.Type.COMMON, ModConfigs.SPEC);
 
         // network
         Net.init();
 
         // mod event bus
-        var modBus = FMLJavaModLoadingContext.get().getModEventBus();
+        var modBus = FMLJavaModLoadingContext.getModEventBus();
         ModSounds.SOUND_EVENTS.register(modBus);
         com.bo.cultivatereg.registry.ModBlocks.register(modBus);
         com.bo.cultivatereg.registry.ModItems.register(modBus);

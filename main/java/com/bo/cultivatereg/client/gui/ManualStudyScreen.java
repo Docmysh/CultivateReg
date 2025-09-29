@@ -33,7 +33,10 @@ import java.util.List;
  */
 @OnlyIn(Dist.CLIENT)
 public class ManualStudyScreen extends Screen {
-    private static final ResourceLocation BOOK_TEXTURE = new ResourceLocation(CultivateReg.MODID, "textures/gui/manual_book.png");
+    private static final ResourceLocation BOOK_TEXTURE = ResourceLocation.fromNamespaceAndPath(
+            CultivateReg.MODID,
+            "textures/gui/manual_book.png"
+    );
     private static final Component PAGE_BREAK = Component.literal("FORCE_PAGE_BREAK");
 
     // --- CORRECTED CONSTANTS ---
