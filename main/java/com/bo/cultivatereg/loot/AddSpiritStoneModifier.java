@@ -18,6 +18,7 @@ import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.common.loot.LootModifier;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 public class AddSpiritStoneModifier extends LootModifier {
     public record TierEntry(Item item, int count) {
@@ -39,6 +40,9 @@ public class AddSpiritStoneModifier extends LootModifier {
     private final TierEntry tribulation;
     private final float coreTopChance;
 
+    private static final Function<AddSpiritStoneModifier, Optional<TierEntry>> VOID_REFINING_GETTER =
+            (AddSpiritStoneModifier modifier) -> modifier.optionalVoidRefining();
+
     public static final Codec<AddSpiritStoneModifier> CODEC = RecordCodecBuilder.create(inst ->
             LootModifier.codecStart(inst)
                     .and(TierEntry.CODEC.fieldOf("low").forGetter(m -> m.low))
@@ -48,7 +52,7 @@ public class AddSpiritStoneModifier extends LootModifier {
                     .and(TierEntry.CODEC.optionalFieldOf("nascent").forGetter(AddSpiritStoneModifier::optionalNascent))
                     .and(TierEntry.CODEC.optionalFieldOf("soul").forGetter(AddSpiritStoneModifier::optionalSoul))
                     .and(TierEntry.CODEC.optionalFieldOf("spirit").forGetter(AddSpiritStoneModifier::optionalSpirit))
-                    .t4(TierEntry.CODEC.optionalFieldOf("void").forGetter(AddSpiritStoneModifier::optionalVoidRefining))
+                    .t4(TierEntry.CODEC.optionalFieldOf("void").forGetter(VOID_REFINING_GETTER))
                     .t4(TierEntry.CODEC.optionalFieldOf("integration").forGetter(AddSpiritStoneModifier::optionalIntegration))
                     .t4(TierEntry.CODEC.optionalFieldOf("tribulation").forGetter(AddSpiritStoneModifier::optionalTribulation))
                     .apply(inst, AddSpiritStoneModifier::new)
