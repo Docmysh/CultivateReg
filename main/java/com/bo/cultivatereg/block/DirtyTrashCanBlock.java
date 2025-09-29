@@ -1,13 +1,18 @@
 package com.bo.cultivatereg.block;
 
+import com.bo.cultivatereg.cultivation.CultivationCapability;
+import com.bo.cultivatereg.cultivation.CultivationData;
 import com.bo.cultivatereg.entity.HomelessManEntity;
 import com.bo.cultivatereg.registry.ModEffects;
 import com.bo.cultivatereg.registry.ModItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -33,9 +38,6 @@ public class DirtyTrashCanBlock extends Block {
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (state.getValue(LOOTED)) {
-            return InteractionResult.sidedSuccess(level.isClientSide);
-        }
 
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
@@ -45,12 +47,30 @@ public class DirtyTrashCanBlock extends Block {
         boolean questComplete = entities.stream().anyMatch(HomelessManEntity::isQuestComplete);
 
         if (!questComplete) {
-            player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.cultivatereg.trash_can.too_foul"), true);
+            player.sendSystemMessage(Component.translatable("message.cultivatereg.trash_can.too_foul").withStyle(ChatFormatting.GRAY));
             return InteractionResult.CONSUME;
         }
 
-        level.setBlock(pos, state.setValue(LOOTED, Boolean.TRUE), Block.UPDATE_CLIENTS);
-        Block.popResource(level, pos.above(), ModItems.BASIC_QI_MANUAL.get().getDefaultInstance());
+        boolean cultivationUnlocked = player.getCapability(CultivationCapability.CULTIVATION_CAP)
+                .map(CultivationData::isCultivationUnlocked)
+                .orElse(false);
+
+        if (!cultivationUnlocked) {
+            player.sendSystemMessage(Component.translatable("message.cultivatereg.trash_can.need_filthy_manual").withStyle(ChatFormatting.RED));
+            return InteractionResult.CONSUME;
+        }
+
+        if (!state.getValue(LOOTED)) {
+            ItemStack manual = new ItemStack(ModItems.BASIC_QI_MANUAL.get());
+            if (!player.addItem(manual)) {
+                player.drop(manual, false);
+            }
+
+            level.setBlock(pos, state.setValue(LOOTED, Boolean.TRUE), Block.UPDATE_CLIENTS);
+            player.sendSystemMessage(Component.translatable("message.cultivatereg.trash_can.find_manual").withStyle(ChatFormatting.GOLD));
+        } else {
+            player.sendSystemMessage(Component.translatable("message.cultivatereg.trash_can.empty").withStyle(ChatFormatting.GRAY));
+        }
         player.addEffect(new MobEffectInstance(ModEffects.STANK.get(), 20 * 600));
         return InteractionResult.CONSUME;
     }

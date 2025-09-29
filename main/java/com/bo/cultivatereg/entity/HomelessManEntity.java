@@ -1,6 +1,8 @@
 package com.bo.cultivatereg.entity;
 
 import com.bo.cultivatereg.registry.ModItems;
+import com.bo.cultivatereg.world.HomelessManVillageData;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -16,6 +18,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -23,12 +26,12 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
@@ -70,9 +73,8 @@ public class HomelessManEntity extends PathfinderMob {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(1, new WaterAvoidingRandomStrollGoal(this, 0.5D));
-        this.goalSelector.addGoal(2, new LookAtPlayerGoal(this, Player.class, 8.0F));
-        this.goalSelector.addGoal(3, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 8.0F));
+        this.goalSelector.addGoal(2, new RandomLookAroundGoal(this));
     }
 
     // -------------------- AI & TICKING -------------------- //
@@ -85,6 +87,8 @@ public class HomelessManEntity extends PathfinderMob {
             this.greetingCooldown--;
         }
 
+        this.anchorToTrashCan();
+
         if (this.level() instanceof ServerLevel serverLevel) {
             List<ServerPlayer> players = serverLevel.getEntitiesOfClass(ServerPlayer.class,
                     this.getBoundingBox().inflate(GREETING_RANGE), this::isValidGreetingTarget);
@@ -95,7 +99,7 @@ public class HomelessManEntity extends PathfinderMob {
                 currentPlayers.add(uuid);
 
                 if (!this.playersInGreetingRange.contains(uuid) && this.greetingCooldown == 0) {
-                    player.sendSystemMessage(Component.translatable("message.cultivatereg.homeless_man.greeting"));
+                    player.sendSystemMessage(this.createDialogue("message.cultivatereg.homeless_man.greeting"));
                     this.greetingCooldown = GREETING_COOLDOWN_TICKS;
                 }
             }
@@ -121,24 +125,33 @@ public class HomelessManEntity extends PathfinderMob {
 
         if (!this.isQuestStarted()) {
             this.setQuestStarted(true);
-            player.displayClientMessage(Component.translatable("message.cultivatereg.homeless_man.quest_start"), true);
+            player.sendSystemMessage(this.createDialogue("message.cultivatereg.homeless_man.quest_start"));
             return InteractionResult.SUCCESS;
-        } else if (!this.isQuestComplete()) {
-            // Assuming ModItems.TRASH is your quest item
+        }
+
+        if (!this.isQuestComplete()) {
             if (stack.is(ModItems.BOOZE.get())) {
-                this.setQuestComplete(true);
-                player.displayClientMessage(Component.translatable("message.cultivatereg.homeless_man.quest_complete"), true);
                 if (!player.getAbilities().instabuild) {
                     stack.shrink(1);
                 }
+                this.rewardAndDepart(player);
+
+                ItemStack filthyManual = new ItemStack(ModItems.FILTHY_CULTIVATION_MANUAL.get());
+                boolean added = player.addItem(filthyManual);
+                if (!added) {
+                    player.drop(filthyManual, false);
+                }
+
+                this.setQuestComplete(true);
+                player.sendSystemMessage(this.createDialogue("message.cultivatereg.homeless_man.quest_complete"));
                 return InteractionResult.SUCCESS;
-            } else {
-                player.displayClientMessage(Component.translatable("message.cultivatereg.homeless_man.quest_progress"), true);
             }
-        } else {
-            player.displayClientMessage(Component.translatable("message.cultivatereg.homeless_man.quest_after"), true);
+
+            player.sendSystemMessage(this.createDialogue("message.cultivatereg.homeless_man.quest_progress"));
+            return InteractionResult.SUCCESS;
         }
 
+        player.sendSystemMessage(this.createDialogue("message.cultivatereg.homeless_man.quest_after"));
         return InteractionResult.SUCCESS;
     }
 
@@ -195,6 +208,11 @@ public class HomelessManEntity extends PathfinderMob {
 
     public void setTrashCanPos(@Nullable BlockPos pos) {
         this.trashCanPos = pos;
+        if (pos != null) {
+            this.restrictTo(pos.above(), 1);
+        } else {
+            this.clearRestriction();
+        }
     }
 
     @Nullable
@@ -209,6 +227,27 @@ public class HomelessManEntity extends PathfinderMob {
     @Nullable
     public BlockPos getVillageCenter() {
         return this.villageCenter;
+    }
+
+    private void anchorToTrashCan() {
+        if (this.trashCanPos == null) {
+            return;
+        }
+
+        Vec3 anchor = Vec3.atCenterOf(this.trashCanPos).add(0.0D, 1.0D, 0.0D);
+        double maxDistance = 0.75D;
+        if (this.position().distanceToSqr(anchor) > maxDistance * maxDistance) {
+            this.teleportTo(anchor.x, anchor.y, anchor.z);
+            this.getNavigation().stop();
+        }
+    }
+
+    private Component createDialogue(String translationKey) {
+        Component prefix = Component.literal("Filthy Beggar")
+                .withStyle(style -> style.withColor(ChatFormatting.GOLD).withBold(true));
+        Component separator = Component.literal(" ⟫ ").withStyle(ChatFormatting.DARK_GRAY);
+        Component line = Component.translatable(translationKey).withStyle(ChatFormatting.YELLOW);
+        return Component.empty().append(prefix).append(separator).append(line);
     }
     // -------------------- SOUNDS & PHYSICS -------------------- //
 
@@ -236,5 +275,34 @@ public class HomelessManEntity extends PathfinderMob {
     @Override
     public boolean isPushable() {
         return true;
+    }
+    private void rewardAndDepart(Player player) {
+        if (!(player instanceof ServerPlayer serverPlayer) || !(this.level() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
+        serverPlayer.displayClientMessage(Component.translatable("message.cultivatereg.homeless_man.quest_complete"), true);
+
+        ItemStack manual = new ItemStack(ModItems.FILTHY_CULTIVATION_MANUAL.get());
+        if (!serverPlayer.addItem(manual)) {
+            serverPlayer.spawnAtLocation(manual, 0.25F);
+        }
+
+        if (this.trashCanPos != null) {
+            serverLevel.removeBlock(this.trashCanPos, false);
+        }
+
+        if (this.villageCenter != null) {
+            HomelessManVillageData.get(serverLevel).markBanished(this.villageCenter);
+        }
+
+        LightningBolt lightning = EntityType.LIGHTNING_BOLT.create(serverLevel);
+        if (lightning != null) {
+            lightning.moveTo(this.getX(), this.getY(), this.getZ());
+            lightning.setVisualOnly(true);
+            serverLevel.addFreshEntity(lightning);
+        }
+
+        this.discard();
     }
 }

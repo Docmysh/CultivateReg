@@ -86,8 +86,10 @@ public class HomelessManSpawner {
             level.removeBlock(spawnPos, false);
             return;
         }
-        entity.moveTo(spawnPos.getX() + 0.5D, spawnPos.getY() + 1.0D, spawnPos.getZ() + 0.5D, level.getRandom().nextFloat() * 360.0F, 0.0F);
         RandomSource random = level.getRandom();
+        BlockPos standPos = findStandPosition(level, spawnPos, random);
+        entity.moveTo(standPos.getX() + 0.5D, standPos.getY(), standPos.getZ() + 0.5D,
+                getFacingAngleTowards(standPos, spawnPos), 0.0F);
         entity.setTrashCanPos(spawnPos);
         entity.setVillageCenter(poiPos);
         level.addFreshEntity(entity);
@@ -120,5 +122,27 @@ public class HomelessManSpawner {
             }
         }
         return null;
+    }
+    private static BlockPos findStandPosition(ServerLevel level, BlockPos trashPos, RandomSource random) {
+        for (Direction direction : Direction.Plane.HORIZONTAL.shuffledCopy(random)) {
+            BlockPos groundPos = trashPos.relative(direction);
+            BlockPos feetPos = groundPos.above();
+            if (!level.isEmptyBlock(feetPos) || !level.isEmptyBlock(feetPos.above())) {
+                continue;
+            }
+
+            BlockState groundState = level.getBlockState(groundPos);
+            if (groundState.isFaceSturdy(level, groundPos, Direction.UP)) {
+                return feetPos;
+            }
+        }
+
+        return trashPos.above();
+    }
+
+    private static float getFacingAngleTowards(BlockPos from, BlockPos to) {
+        double dx = (to.getX() + 0.5D) - (from.getX() + 0.5D);
+        double dz = (to.getZ() + 0.5D) - (from.getZ() + 0.5D);
+        return (float) (Math.atan2(dz, dx) * (180F / Math.PI)) - 90.0F;
     }
 }

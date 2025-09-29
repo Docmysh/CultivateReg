@@ -40,11 +40,15 @@
   "block.cultivatereg.dirty_trash_can": "Dirty Trash Can",
   "entity.cultivatereg.homeless_man": "Mystic Beggar",
   "message.cultivatereg.homeless_man.quest_start": "Bring me some booze and maybe I'll spill a secret or two...",
-  "message.cultivatereg.homeless_man.need_booze": "No booze, no secrets. It's that simple.",
-  "message.cultivatereg.homeless_man.quest_complete": "Alright kid, here's the filthy manual I promised.",
-  "message.cultivatereg.homeless_man.after_quest": "Go on, check my trash can if you dare.",
+  "message.cultivatereg.homeless_man.quest_progress": "No booze, no secrets. It's that simple.",
+
+  "message.cultivatereg.homeless_man.quest_complete": "Ha! Thanks for the booze. Here, take this the secrets to immortality!",
+  "message.cultivatereg.homeless_man.quest_after": "Trash can's all yours now, kid. Try not to choke on the smell.",
   "message.cultivatereg.homeless_man.greeting": "Pssst, hey kid, you wanna become an immortal?",
   "message.cultivatereg.trash_can.too_foul": "You gag and back away—the beggar refuses to let you rummage yet.",
+  "message.cultivatereg.trash_can.need_filthy_manual": "You dig around in the trash and something brown seems to be stuck to your hand after.",
+  "message.cultivatereg.trash_can.find_manual": "You rummage through the trash and pull out a Basic Qi Manual!",
+  "message.cultivatereg.trash_can.empty": "You rummage through the trash but find nothing except a clinging stench.",
   "message.cultivatereg.stank.cannot_eat": "You reek too badly to stomach anything. Wash up in water!",
   "message.cultivatereg.stank.cleansed": "The stench washes away, letting you eat again.",
   "effect.cultivatereg.stank": "Stank"
