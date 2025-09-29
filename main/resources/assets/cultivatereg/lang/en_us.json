@@ -8,6 +8,12 @@
   "item.cultivatereg.spirit_stone": "Mid-Grade Spirit Stone",
   "item.cultivatereg.high_spirit_stone": "High-Grade Spirit Stone",
   "item.cultivatereg.top_spirit_stone": "Top-Grade Spirit Stone",
+  "item.cultivatereg.low_spirit_jade": "Low Spirit Jade",
+  "item.cultivatereg.mid_spirit_jade": "Mid Spirit Jade",
+  "item.cultivatereg.high_spirit_jade": "High Spirit Jade",
+  "item.cultivatereg.top_spirit_jade": "Top Spirit Jade",
+  "item.cultivatereg.divine_stone_shard": "Divine Stone Shard",
+  "item.cultivatereg.divine_stone": "Divine Stone",
   "item.cultivatereg.filthy_manual": "I Wanted to Cultivate to Immortality, Yet Somehow Ended Up With Nothing But a Filthy Book From Some Homeless Guy",
   "item.cultivatereg.filthy_manual.tooltip": "The pages reek of garbage and piss, but they might just hint at how meridians can open.",
   "item.cultivatereg.filthy_manual.message.unlock": "The beggar's ravings coalesce in your mind. You can finally see the path of cultivation.",
@@ -51,6 +57,7 @@
   "message.cultivatereg.trash_can.empty": "You rummage through the trash but find nothing except a clinging stench.",
   "message.cultivatereg.stank.cannot_eat": "You reek too badly to stomach anything. Wash up in water!",
   "message.cultivatereg.stank.cleansed": "The stench washes away, letting you eat again.",
+  "message.cultivatereg.spirit_stone.need_meditate": "You must be meditating to channel a spirit stone.",
   "effect.cultivatereg.stank": "Stank",
   "effect.cultivatereg.gross_hands": "#$%$ on My Hand"
 

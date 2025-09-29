@@ -22,7 +22,7 @@ public enum Realm {
     ),
     QI_GATHERING(
             Tier.QI,
-            0.18f,
+            0.010865512f,
             "Qi Gather",
             0xFF4FC3F7,
             new float[]{0.30f, 0.85f, 1.00f},
@@ -32,7 +32,7 @@ public enum Realm {
     ),
     FOUNDATION(
             Tier.FOUNDATION,
-            0.10f,
+            0.019934548f,
             "Foundation",
             0xFFB388FF,
             new float[]{0.70f, 0.40f, 1.00f},
@@ -42,7 +42,7 @@ public enum Realm {
     ),
     CORE_FORMATION(
             Tier.CORE,
-            0.06f,
+            0.02898555f,
             "Core Form",
             0xFFFFD54F,
             new float[]{1.00f, 0.85f, 0.20f},
@@ -52,7 +52,7 @@ public enum Realm {
     ),
     NASCENT_SOUL(
             Tier.CORE,
-            0.04f,
+            0.05443495f,
             "Nascent",
             0xFFFFA726,
             new float[]{1.00f, 0.55f, 0.25f},
@@ -62,7 +62,7 @@ public enum Realm {
     ),
     SOUL_TRANSFORMATION(
             Tier.CORE,
-            0.028f,
+            0.060427144f,
             "Soul Trans",
             0xFFFF7043,
             new float[]{0.95f, 0.35f, 0.40f},
@@ -72,7 +72,7 @@ public enum Realm {
     ),
     SPIRIT_SEVERING(
             Tier.CORE,
-            0.020f,
+            0.051064335f,
             "Spirit Sev",
             0xFFE573AB,
             new float[]{0.90f, 0.30f, 0.60f},
@@ -82,7 +82,7 @@ public enum Realm {
     ),
     VOID_REFINING(
             Tier.CORE,
-            0.014f,
+            0.037671156f,
             "Void Ref",
             0xFF64B5F6,
             new float[]{0.55f, 0.70f, 1.00f},
@@ -92,7 +92,7 @@ public enum Realm {
     ),
     INTEGRATION(
             Tier.CORE,
-            0.010f,
+            0.025344908f,
             "Integration",
             0xFF26C6DA,
             new float[]{0.30f, 0.90f, 0.75f},
@@ -102,7 +102,7 @@ public enum Realm {
     ),
     TRIBULATION(
             Tier.CORE,
-            0.007f,
+            0.016647294f,
             "Tribulation",
             0xFFF5F5F5,
             new float[]{0.95f, 0.95f, 1.00f},

@@ -31,6 +31,12 @@ public class AddSpiritStoneModifier extends LootModifier {
     private final TierEntry mid;
     private final TierEntry high;
     private final TierEntry top;
+    private final TierEntry nascent;
+    private final TierEntry soul;
+    private final TierEntry spirit;
+    private final TierEntry voidRefining;
+    private final TierEntry integration;
+    private final TierEntry tribulation;
     private final float coreTopChance;
 
     public static final Codec<AddSpiritStoneModifier> CODEC = RecordCodecBuilder.create(inst ->
@@ -39,23 +45,41 @@ public class AddSpiritStoneModifier extends LootModifier {
                     .and(TierEntry.CODEC.fieldOf("mid").forGetter(m -> m.mid))
                     .and(TierEntry.CODEC.fieldOf("high").forGetter(m -> m.high))
                     .and(TierEntry.CODEC.fieldOf("top").forGetter(m -> m.top))
+                    .and(TierEntry.CODEC.optionalFieldOf("nascent").forGetter(m -> Optional.ofNullable(m.nascent)))
+                    .and(TierEntry.CODEC.optionalFieldOf("soul").forGetter(m -> Optional.ofNullable(m.soul)))
+                    .and(TierEntry.CODEC.optionalFieldOf("spirit").forGetter(m -> Optional.ofNullable(m.spirit)))
+                    .and(TierEntry.CODEC.optionalFieldOf("void").forGetter(m -> Optional.ofNullable(m.voidRefining)))
+                    .and(TierEntry.CODEC.optionalFieldOf("integration").forGetter(m -> Optional.ofNullable(m.integration)))
+                    .and(TierEntry.CODEC.optionalFieldOf("tribulation").forGetter(m -> Optional.ofNullable(m.tribulation)))
                     .and(Codec.FLOAT.optionalFieldOf("core_top_chance", 0.05f).forGetter(m -> m.coreTopChance))
                     .apply(inst, AddSpiritStoneModifier::new)
     );
 
     protected AddSpiritStoneModifier(
-                LootItemCondition[] conditions,
-                TierEntry low,
-                TierEntry mid,
-                TierEntry high,
-                TierEntry top,
-        float coreTopChance
+            LootItemCondition[] conditions,
+            TierEntry low,
+            TierEntry mid,
+            TierEntry high,
+            TierEntry top,
+            Optional<TierEntry> nascent,
+            Optional<TierEntry> soul,
+            Optional<TierEntry> spirit,
+            Optional<TierEntry> voidRefining,
+            Optional<TierEntry> integration,
+            Optional<TierEntry> tribulation,
+            float coreTopChance
     ) {
             super(conditions);
             this.low = low;
             this.mid = mid;
             this.high = high;
             this.top = top;
+        this.nascent = nascent.orElse(null);
+        this.soul = soul.orElse(null);
+        this.spirit = spirit.orElse(null);
+        this.voidRefining = voidRefining.orElse(null);
+        this.integration = integration.orElse(null);
+        this.tribulation = tribulation.orElse(null);
             this.coreTopChance = Math.max(0.0f, coreTopChance);
         }
 
@@ -83,6 +107,30 @@ public class AddSpiritStoneModifier extends LootModifier {
                 if (coreTopChance > 0f && ctx.getRandom().nextFloat() < coreTopChance) {
                     addIfPresent(generatedLoot, top);
                 }
+            } else if (realm == Realm.NASCENT_SOUL) {
+                if (!addIfPresent(generatedLoot, nascent)) {
+                    addIfPresent(generatedLoot, top);
+                }
+            } else if (realm == Realm.SOUL_TRANSFORMATION) {
+                if (!addIfPresent(generatedLoot, soul)) {
+                    addIfPresent(generatedLoot, nascent);
+                }
+            } else if (realm == Realm.SPIRIT_SEVERING) {
+                if (!addIfPresent(generatedLoot, spirit)) {
+                    addIfPresent(generatedLoot, soul);
+                }
+            } else if (realm == Realm.VOID_REFINING) {
+                if (!addIfPresent(generatedLoot, voidRefining)) {
+                    addIfPresent(generatedLoot, spirit);
+                }
+            } else if (realm == Realm.INTEGRATION) {
+                if (!addIfPresent(generatedLoot, integration)) {
+                    addIfPresent(generatedLoot, voidRefining);
+                }
+            } else if (realm == Realm.TRIBULATION) {
+                if (!addIfPresent(generatedLoot, tribulation)) {
+                    addIfPresent(generatedLoot, integration);
+                }
             } else {
                 // Qi Gathering or anything else defaults to low tier
                 addIfPresent(generatedLoot, low);
@@ -91,12 +139,13 @@ public class AddSpiritStoneModifier extends LootModifier {
             return generatedLoot;
         }
 
-        private static void addIfPresent(ObjectArrayList<ItemStack> generatedLoot, TierEntry entry) {
-            if (entry == null) return;
+    private static boolean addIfPresent(ObjectArrayList<ItemStack> generatedLoot, TierEntry entry) {
+        if (entry == null) return false;
             Item item = entry.item();
             int count = entry.count();
-            if (item == null || count <= 0) return;
+        if (item == null || count <= 0) return false;
             generatedLoot.add(new ItemStack(item, count));
+        return true;
         }
 
         @Override

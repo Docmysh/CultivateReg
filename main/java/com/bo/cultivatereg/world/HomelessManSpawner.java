@@ -56,8 +56,16 @@ public class HomelessManSpawner {
             return;
         }
 
+        if (data.hasBanishedNearby(poiPos, 64)) {
+            return;
+        }
+
         if (!data.canSpawn(poiPos)) {
             // already spawned and still present
+            return;
+        }
+
+        if (data.hasSpawnedNearby(poiPos, 64)) {
             return;
         }
 

@@ -109,7 +109,7 @@ public class ServerEvents {
             if (data.isMeditating()) {
                 if (data.hasSensed() && data.getRealm() != Realm.MORTAL) {
                     float rate = data.getRealm().baseRate * data.getRealm().rateMultiplierForStage(data.getStage())
-                            * Math.max(0f, data.getMeridianBonusMultiplier());
+                            * data.getMeridianBonusMultiplier();
                     data.addQi(rate);
                     dirty = true;
                     boolean progressed = false;

@@ -1,0 +1,12 @@
+{
+  "sources": [
+    {
+      "type": "single",
+      "resource": "cultivatereg:mob_effect/stank"
+    },
+    {
+      "type": "single",
+      "resource": "cultivatereg:mob_effect/gross_hands"
+    }
+  ]
+}

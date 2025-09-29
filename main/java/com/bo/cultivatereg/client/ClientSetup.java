@@ -38,7 +38,13 @@ public class ClientSetup {
                 ModItems.LOW_GRADE_SPIRIT_STONE.get(),
                 ModItems.SPIRIT_STONE.get(),
                 ModItems.HIGH_GRADE_SPIRIT_STONE.get(),
-                ModItems.TOP_GRADE_SPIRIT_STONE.get()
+                ModItems.TOP_GRADE_SPIRIT_STONE.get(),
+                ModItems.LOW_SPIRIT_JADE.get(),
+                ModItems.MID_SPIRIT_JADE.get(),
+                ModItems.HIGH_SPIRIT_JADE.get(),
+                ModItems.TOP_SPIRIT_JADE.get(),
+                ModItems.DIVINE_STONE_SHARD.get(),
+                ModItems.DIVINE_STONE.get()
         );
     }
 }

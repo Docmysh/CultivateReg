@@ -72,6 +72,31 @@ public class HomelessManVillageData extends SavedData {
         return status == Status.BANISHED;
     }
 
+    public boolean hasBanishedNearby(BlockPos pos, int radius) {
+        return this.hasStatusWithinRadius(pos, Status.BANISHED, radius);
+    }
+
+    public boolean hasSpawnedNearby(BlockPos pos, int radius) {
+        return this.hasStatusWithinRadius(pos, Status.SPAWNED, radius);
+    }
+
+    private boolean hasStatusWithinRadius(BlockPos pos, Status status, int radius) {
+        int radiusSq = radius * radius;
+        for (Map.Entry<Long, Status> entry : this.villages.entrySet()) {
+            if (entry.getValue() != status) {
+                continue;
+            }
+
+            BlockPos stored = BlockPos.of(entry.getKey());
+            int dx = stored.getX() - pos.getX();
+            int dz = stored.getZ() - pos.getZ();
+            if (dx * dx + dz * dz <= radiusSq) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private enum Status {
         NONE,
         SPAWNED,
