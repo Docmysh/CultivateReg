@@ -88,7 +88,7 @@ public class HomelessManSpawner {
         }
         RandomSource random = level.getRandom();
         BlockPos standPos = findStandPosition(level, spawnPos, random);
-        entity.moveTo(standPos.getX() + 0.5D, standPos.getY(), standPos.getZ() + 0.5D,
+        entity.moveTo(standPos.getX() + 2D, standPos.getY(), standPos.getZ() + 0.5D,
                 getFacingAngleTowards(standPos, spawnPos), 0.0F);
         entity.setTrashCanPos(spawnPos);
         entity.setVillageCenter(poiPos);

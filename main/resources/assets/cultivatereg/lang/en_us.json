@@ -51,6 +51,7 @@
   "message.cultivatereg.trash_can.empty": "You rummage through the trash but find nothing except a clinging stench.",
   "message.cultivatereg.stank.cannot_eat": "You reek too badly to stomach anything. Wash up in water!",
   "message.cultivatereg.stank.cleansed": "The stench washes away, letting you eat again.",
-  "effect.cultivatereg.stank": "Stank"
+  "effect.cultivatereg.stank": "Stank",
+  "effect.cultivatereg.gross_hands": "#$%$ on My Hand"
 
 }

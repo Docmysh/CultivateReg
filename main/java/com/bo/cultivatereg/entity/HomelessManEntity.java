@@ -1,5 +1,6 @@
 package com.bo.cultivatereg.entity;
 
+import com.bo.cultivatereg.block.DirtyTrashCanBlock;
 import com.bo.cultivatereg.registry.ModItems;
 import com.bo.cultivatereg.world.HomelessManVillageData;
 import net.minecraft.ChatFormatting;
@@ -29,6 +30,7 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -136,11 +138,7 @@ public class HomelessManEntity extends PathfinderMob {
                 }
                 this.rewardAndDepart(player);
 
-                ItemStack filthyManual = new ItemStack(ModItems.FILTHY_CULTIVATION_MANUAL.get());
-                boolean added = player.addItem(filthyManual);
-                if (!added) {
-                    player.drop(filthyManual, false);
-                }
+
 
                 this.setQuestComplete(true);
                 player.sendSystemMessage(this.createDialogue("message.cultivatereg.homeless_man.quest_complete"));
@@ -235,7 +233,7 @@ public class HomelessManEntity extends PathfinderMob {
         }
 
         Vec3 anchor = Vec3.atCenterOf(this.trashCanPos).add(0.0D, 1.0D, 0.0D);
-        double maxDistance = 0.75D;
+        double maxDistance = 2D;
         if (this.position().distanceToSqr(anchor) > maxDistance * maxDistance) {
             this.teleportTo(anchor.x, anchor.y, anchor.z);
             this.getNavigation().stop();
@@ -289,7 +287,12 @@ public class HomelessManEntity extends PathfinderMob {
         }
 
         if (this.trashCanPos != null) {
-            serverLevel.removeBlock(this.trashCanPos, false);
+            BlockState state = serverLevel.getBlockState(this.trashCanPos);
+            if (state.getBlock() instanceof DirtyTrashCanBlock) {
+                serverLevel.setBlock(this.trashCanPos,
+                        state.setValue(DirtyTrashCanBlock.UNLOCKED, Boolean.TRUE),
+                        Block.UPDATE_CLIENTS);
+            }
         }
 
         if (this.villageCenter != null) {

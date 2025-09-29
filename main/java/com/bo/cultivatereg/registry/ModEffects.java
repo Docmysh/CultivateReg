@@ -1,6 +1,7 @@
 package com.bo.cultivatereg.registry;
 
 import com.bo.cultivatereg.CultivateReg;
+import com.bo.cultivatereg.effect.GrossHandsEffect;
 import com.bo.cultivatereg.effect.StankEffect;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -13,6 +14,7 @@ public class ModEffects {
             DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, CultivateReg.MODID);
 
     public static final RegistryObject<MobEffect> STANK = EFFECTS.register("stank", StankEffect::new);
+    public static final RegistryObject<MobEffect> GROSS_HANDS = EFFECTS.register("gross_hands", GrossHandsEffect::new);
 
     public static void register(IEventBus bus) {
         EFFECTS.register(bus);

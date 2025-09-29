@@ -25,15 +25,18 @@ import java.util.List;
 
 public class DirtyTrashCanBlock extends Block {
     public static final BooleanProperty LOOTED = BooleanProperty.create("looted");
+    public static final BooleanProperty UNLOCKED = BooleanProperty.create("unlocked");
 
     public DirtyTrashCanBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(LOOTED, Boolean.FALSE));
+        this.registerDefaultState(this.stateDefinition.any()
+                .setValue(LOOTED, Boolean.FALSE)
+                .setValue(UNLOCKED, Boolean.FALSE));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(LOOTED);
+        builder.add(LOOTED, UNLOCKED);
     }
 
     @Override
@@ -44,7 +47,8 @@ public class DirtyTrashCanBlock extends Block {
         }
 
         List<HomelessManEntity> entities = level.getEntitiesOfClass(HomelessManEntity.class, new AABB(pos).inflate(5.0D));
-        boolean questComplete = entities.stream().anyMatch(HomelessManEntity::isQuestComplete);
+        boolean questComplete = state.getValue(UNLOCKED)
+                || entities.stream().anyMatch(HomelessManEntity::isQuestComplete);
 
         if (!questComplete) {
             player.sendSystemMessage(Component.translatable("message.cultivatereg.trash_can.too_foul").withStyle(ChatFormatting.GRAY));
@@ -57,6 +61,8 @@ public class DirtyTrashCanBlock extends Block {
 
         if (!cultivationUnlocked) {
             player.sendSystemMessage(Component.translatable("message.cultivatereg.trash_can.need_filthy_manual").withStyle(ChatFormatting.RED));
+            player.addEffect(new MobEffectInstance(ModEffects.GROSS_HANDS.get(), 20 * 300));
+            player.addEffect(new MobEffectInstance(ModEffects.STANK.get(), 20 * 600));
             return InteractionResult.CONSUME;
         }
 
