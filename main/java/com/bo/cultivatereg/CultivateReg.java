@@ -1,6 +1,12 @@
 package com.bo.cultivatereg;
 
 import com.bo.cultivatereg.network.Net;
+import com.bo.cultivatereg.registry.ModBlocks;
+import com.bo.cultivatereg.registry.ModEffects;
+import com.bo.cultivatereg.registry.ModEntities;
+import com.bo.cultivatereg.registry.ModItems;
+import com.bo.cultivatereg.registry.ModLootModifiers;
+import com.bo.cultivatereg.registry.ModSounds;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -20,6 +26,13 @@ public final class CultivateReg {
     public CultivateReg() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         modBus.addListener(this::commonSetup);
+
+        ModBlocks.register(modBus);
+        ModItems.register(modBus);
+        ModEffects.register(modBus);
+        ModEntities.register(modBus);
+        ModLootModifiers.register(modBus);
+        ModSounds.register(modBus);
 
         MinecraftForge.EVENT_BUS.register(this);
     }
