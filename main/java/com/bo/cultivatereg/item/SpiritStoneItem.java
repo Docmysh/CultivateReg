@@ -10,13 +10,16 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 
 public class SpiritStoneItem extends Item {
     private static final float DEFAULT_MINUTES_OF_PROGRESS = 15f;
+    private static final int ABSORB_DURATION_TICKS = 60;
 
     private final int color;
     private final Realm requiredRealm;
@@ -36,15 +39,41 @@ public class SpiritStoneItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (level.isClientSide || !(player instanceof ServerPlayer serverPlayer)) {
-            return InteractionResultHolder.pass(stack);
+        if (player instanceof ServerPlayer serverPlayer && !level.isClientSide) {
+            CultivationData data = serverPlayer.getCapability(CultivationCapability.CULTIVATION_CAP)
+                    .resolve()
+                    .orElse(null);
+            if (data == null) {
+                return InteractionResultHolder.pass(stack);
+            }
+
+            if (!data.isMeditating()) {
+                player.displayClientMessage(Component.translatable("message.cultivatereg.spirit_stone.need_meditate"), true);
+                return InteractionResultHolder.fail(stack);
+            }
         }
 
-        InteractionResult result = handleUse(level, serverPlayer, stack);
-        if (result == InteractionResult.SUCCESS) {
-            return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+        player.startUsingItem(hand);
+        return InteractionResultHolder.consume(stack);
+    }
+
+    @Override
+    public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
+        ItemStack result = super.finishUsingItem(stack, level, entity);
+        if (!level.isClientSide && entity instanceof ServerPlayer serverPlayer) {
+            handleUse(level, serverPlayer, result);
         }
-        return new InteractionResultHolder<>(result, stack);
+        return result;
+    }
+
+    @Override
+    public int getUseDuration(ItemStack stack) {
+        return ABSORB_DURATION_TICKS;
+    }
+
+    @Override
+    public UseAnim getUseAnimation(ItemStack stack) {
+        return UseAnim.BLOCK;
     }
 
     private InteractionResult handleUse(Level level, ServerPlayer player, ItemStack stack) {
@@ -65,7 +94,8 @@ public class SpiritStoneItem extends Item {
             return InteractionResult.SUCCESS;
         }
 
-        float qiPerTick = playerRealm.baseRate * playerRealm.rateMultiplierForStage(data.getStage())
+        int stageForStone = requiredRealm == playerRealm ? data.getStage() : 1;
+        float qiPerTick = requiredRealm.baseRate * requiredRealm.rateMultiplierForStage(stageForStone)
                 * data.getMeridianBonusMultiplier();
         if (qiPerTick <= 0f) {
             return InteractionResult.FAIL;
