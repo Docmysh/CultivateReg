@@ -1,7 +1,9 @@
 package com.bo.cultivatereg.aging;
 
+import com.bo.cultivatereg.cultivation.Realm;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.Mth;
 
 /**
  * Stores the client facing representation of a player's age.
@@ -22,6 +24,10 @@ public class PlayerAgingData {
     private int lifeExpectancyYears;
     private int lifeExpectancyMonths;
     private float progressToNextStage;
+    private Realm realm = Realm.MORTAL;
+    private int maxLifespanDays;
+    private float agingMultiplier = 1.0F;
+    private int graceDays;
 
     public PlayerAgingData() {
     }
@@ -98,6 +104,10 @@ public class PlayerAgingData {
         lifeExpectancyYears = other.lifeExpectancyYears;
         lifeExpectancyMonths = other.lifeExpectancyMonths;
         progressToNextStage = other.progressToNextStage;
+        realm = other.realm;
+        maxLifespanDays = other.maxLifespanDays;
+        agingMultiplier = other.agingMultiplier;
+        graceDays = other.graceDays;
     }
 
     public CompoundTag serializeNBT() {
@@ -109,6 +119,10 @@ public class PlayerAgingData {
         tag.putInt("LifeExpectancyYears", lifeExpectancyYears);
         tag.putInt("LifeExpectancyMonths", lifeExpectancyMonths);
         tag.putFloat("Progress", progressToNextStage);
+        tag.putInt("Realm", realm.ordinal());
+        tag.putInt("MaxLifespanDays", maxLifespanDays);
+        tag.putFloat("AgingMultiplier", agingMultiplier);
+        tag.putInt("GraceDays", graceDays);
         return tag;
     }
 
@@ -124,6 +138,11 @@ public class PlayerAgingData {
         lifeExpectancyYears = tag.getInt("LifeExpectancyYears");
         lifeExpectancyMonths = clampMonthValue(tag.getInt("LifeExpectancyMonths"));
         progressToNextStage = Math.max(0.0F, Math.min(1.0F, tag.getFloat("Progress")));
+        int realmIdx = Mth.clamp(tag.getInt("Realm"), 0, Realm.values().length - 1);
+        realm = Realm.values()[realmIdx];
+        maxLifespanDays = Math.max(0, tag.getInt("MaxLifespanDays"));
+        agingMultiplier = Math.max(0.0F, tag.getFloat("AgingMultiplier"));
+        graceDays = Math.max(0, tag.getInt("GraceDays"));
     }
 
     public void writeToBuffer(FriendlyByteBuf buf) {
@@ -134,6 +153,10 @@ public class PlayerAgingData {
         buf.writeVarInt(lifeExpectancyYears);
         buf.writeVarInt(lifeExpectancyMonths);
         buf.writeFloat(progressToNextStage);
+        buf.writeVarInt(realm.ordinal());
+        buf.writeVarInt(maxLifespanDays);
+        buf.writeFloat(agingMultiplier);
+        buf.writeVarInt(graceDays);
     }
 
     public static PlayerAgingData readFromBuffer(FriendlyByteBuf buf) {
@@ -145,7 +168,63 @@ public class PlayerAgingData {
         data.lifeExpectancyYears = buf.readVarInt();
         data.lifeExpectancyMonths = clampMonthValue(buf.readVarInt());
         data.progressToNextStage = Math.max(0.0F, Math.min(1.0F, buf.readFloat()));
+        int realmIdx = Mth.clamp(buf.readVarInt(), 0, Realm.values().length - 1);
+        data.realm = Realm.values()[realmIdx];
+        data.maxLifespanDays = Math.max(0, buf.readVarInt());
+        data.agingMultiplier = Math.max(0.0F, buf.readFloat());
+        data.graceDays = Math.max(0, buf.readVarInt());
         return data;
+    }
+
+    public Realm getRealm() {
+        return realm;
+    }
+
+    public void setRealm(Realm realm) {
+        this.realm = realm == null ? Realm.MORTAL : realm;
+    }
+
+    public int getMaxLifespanDays() {
+        return maxLifespanDays;
+    }
+
+    public void setMaxLifespanDays(int maxLifespanDays) {
+        this.maxLifespanDays = Math.max(0, maxLifespanDays);
+    }
+
+    public float getAgingMultiplier() {
+        return agingMultiplier;
+    }
+
+    public void setAgingMultiplier(float agingMultiplier) {
+        this.agingMultiplier = Math.max(0.0F, agingMultiplier);
+    }
+
+    public int getGraceDays() {
+        return graceDays;
+    }
+
+    public void setGraceDays(int graceDays) {
+        this.graceDays = Math.max(0, graceDays);
+    }
+
+    public int getBiologicalDays() {
+        int years = Math.max(0, biologicalYears);
+        int months = Math.max(0, biologicalMonths);
+        return years * 360 + months * 30;
+    }
+
+    public AgeBracket getAgeBracket() {
+        if (maxLifespanDays <= 0) {
+            return AgeBracket.YOUTH;
+        }
+        float ratio = getBiologicalDays() / (float) maxLifespanDays;
+        if (ratio < 0.20F) return AgeBracket.YOUTH;
+        if (ratio < 0.45F) return AgeBracket.ADULT;
+        if (ratio < 0.70F) return AgeBracket.MIDDLE;
+        if (ratio < 0.95F) return AgeBracket.ELDER;
+        if (ratio < 1.20F) return AgeBracket.ANCIENT;
+        return AgeBracket.TRANSCENDED;
     }
 
     private static int clampMonthValue(int value) {
