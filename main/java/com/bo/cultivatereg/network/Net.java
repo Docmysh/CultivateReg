@@ -11,8 +11,11 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public final class Net {
     private static final String PROTOCOL = "1";
+    private static final AtomicBoolean REGISTERED = new AtomicBoolean(false);
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(CultivateReg.MOD_ID, "main"),
             () -> PROTOCOL,
@@ -24,6 +27,10 @@ public final class Net {
     }
 
     public static void register() {
+        if (!REGISTERED.compareAndSet(false, true)) {
+            CultivateReg.LOGGER.warn("Tried to register network handlers more than once; ignoring duplicate call.");
+            return;
+        }
         int id = 0;
         CHANNEL.registerMessage(id++, SyncCultivationPacket.class, SyncCultivationPacket::encode, SyncCultivationPacket::decode, SyncCultivationPacket::handle);
         CHANNEL.registerMessage(id++, SyncMobCultivationPacket.class, SyncMobCultivationPacket::encode, SyncMobCultivationPacket::decode, SyncMobCultivationPacket::handle);
