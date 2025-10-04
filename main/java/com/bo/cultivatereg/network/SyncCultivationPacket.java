@@ -15,6 +15,7 @@ public record SyncCultivationPacket(
         int stage,
         float qi,
         boolean meditating,
+        boolean cultivationUnlocked,
         boolean sensed,
         float senseProgress,
         float spirit,
@@ -32,6 +33,7 @@ public record SyncCultivationPacket(
         buf.writeVarInt(pkt.stage());
         buf.writeFloat(pkt.qi());
         buf.writeBoolean(pkt.meditating());
+        buf.writeBoolean(pkt.cultivationUnlocked());
         buf.writeBoolean(pkt.sensed());
         buf.writeFloat(pkt.senseProgress());
         buf.writeFloat(pkt.spirit());
@@ -51,6 +53,7 @@ public record SyncCultivationPacket(
         int stage = buf.readVarInt();
         float qi = buf.readFloat();
         boolean meditating = buf.readBoolean();
+        boolean cultivationUnlocked = buf.readBoolean();
         boolean sensed = buf.readBoolean();
         float senseProgress = buf.readFloat();
         float spirit = buf.readFloat();
@@ -65,7 +68,7 @@ public record SyncCultivationPacket(
         byte[] prog = buf.readByteArray(n);
         return new SyncCultivationPacket(
                 realmOrdinal, stage, qi,
-                meditating, sensed, senseProgress,
+                meditating, cultivationUnlocked, sensed, senseProgress,
                 spirit, resting, shielding, flying,
                 manualId, manualQuizProgress, manualQuizPassed,
                 mask, prog
@@ -82,6 +85,7 @@ public record SyncCultivationPacket(
                 data.setStage(pkt.stage());
                 data.setQi(pkt.qi());
                 data.setMeditating(pkt.meditating());
+                data.setCultivationUnlocked(pkt.cultivationUnlocked());
                 data.setSensed(pkt.sensed());
                 data.setSenseProgress(pkt.senseProgress());
                 data.setSpirit(pkt.spirit());

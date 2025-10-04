@@ -16,6 +16,7 @@ public record StartShieldPacket() {
             var sp = c.getSender();
             if (sp == null) return;
             sp.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(data -> {
+                if (!data.isCultivationUnlocked()) return;
                 // No realm gate: just need Spirit > 0
                 if (data.getSpirit() > 0f) {
                     data.setMeditating(false);

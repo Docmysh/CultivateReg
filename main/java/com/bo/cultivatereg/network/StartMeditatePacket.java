@@ -17,6 +17,7 @@ public record StartMeditatePacket() {
             var sender = c.getSender();
             if (sender == null) return;
             sender.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent((CultivationData data) -> {
+                if (!data.isCultivationUnlocked()) return;
                 // Cannot meditate while using other abilities
                 if (data.isShielding() || data.isFlying()) return;
 

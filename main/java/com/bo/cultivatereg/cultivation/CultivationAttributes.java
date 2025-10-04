@@ -73,7 +73,7 @@ public final class CultivationAttributes {
     private static Mods computeMods(CultivationData data) {
         Realm realm = data.getRealm();
         int stage = Math.max(1, Math.min(9, data.getStage()));
-        double mult = Math.max(0.0, data.getMeridianBonusMultiplier());
+        double mult = data.getMeridianBonusMultiplier();
         switch (realm) {
             case MORTAL:
                 return new Mods(0.0, 0.0, 0.0, 0.0);
@@ -88,17 +88,23 @@ public final class CultivationAttributes {
                 return new Mods((40 + 4.0 * stage) * mult, (0.10 + 0.05 * stage) * mult,
                         (5.0 + 1.0 * stage) * mult, (0.10 + 0.05 * stage) * mult);
             case NASCENT_SOUL:
-                return new Mods(80 + 6.0 * stage, 0.15 + 0.06 * stage, 10.0 + 1.25 * stage, 0.15 + 0.06 * stage);
+                return new Mods((80 + 6.0 * stage) * mult, (0.15 + 0.06 * stage) * mult,
+                        (10.0 + 1.25 * stage) * mult, (0.15 + 0.06 * stage) * mult);
             case SOUL_TRANSFORMATION:
-                return new Mods(120 + 8.0 * stage, 0.20 + 0.07 * stage, 15.0 + 1.50 * stage, 0.20 + 0.07 * stage);
+                return new Mods((120 + 8.0 * stage) * mult, (0.20 + 0.07 * stage) * mult,
+                        (15.0 + 1.50 * stage) * mult, (0.20 + 0.07 * stage) * mult);
             case SPIRIT_SEVERING:
-                return new Mods(160 + 10.0 * stage, 0.25 + 0.08 * stage, 20.0 + 1.75 * stage, 0.25 + 0.08 * stage);
+                return new Mods((160 + 10.0 * stage) * mult, (0.25 + 0.08 * stage) * mult,
+                        (20.0 + 1.75 * stage) * mult, (0.25 + 0.08 * stage) * mult);
             case VOID_REFINING:
-                return new Mods(200 + 12.0 * stage, 0.30 + 0.09 * stage, 25.0 + 2.00 * stage, 0.30 + 0.09 * stage);
+                return new Mods((200 + 12.0 * stage) * mult, (0.30 + 0.09 * stage) * mult,
+                        (25.0 + 2.00 * stage) * mult, (0.30 + 0.09 * stage) * mult);
             case INTEGRATION:
-                return new Mods(240 + 14.0 * stage, 0.35 + 0.10 * stage, 30.0 + 2.25 * stage, 0.35 + 0.10 * stage);
+                return new Mods((240 + 14.0 * stage) * mult, (0.35 + 0.10 * stage) * mult,
+                        (30.0 + 2.25 * stage) * mult, (0.35 + 0.10 * stage) * mult);
             case TRIBULATION:
-                return new Mods(280 + 16.0 * stage, 0.40 + 0.12 * stage, 35.0 + 2.50 * stage, 0.40 + 0.12 * stage);
+                return new Mods((280 + 16.0 * stage) * mult, (0.40 + 0.12 * stage) * mult,
+                        (35.0 + 2.50 * stage) * mult, (0.40 + 0.12 * stage) * mult);
         }
         return new Mods(0, 0, 0, 0);
     }

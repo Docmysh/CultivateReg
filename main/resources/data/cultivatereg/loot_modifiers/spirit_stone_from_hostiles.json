@@ -12,5 +12,11 @@
   "mid": { "item": "cultivatereg:spirit_stone", "count": 1 },
   "high": { "item": "cultivatereg:high_spirit_stone", "count": 1 },
   "top": { "item": "cultivatereg:top_spirit_stone", "count": 1 },
+  "nascent": { "item": "cultivatereg:low_spirit_jade", "count": 1 },
+  "soul": { "item": "cultivatereg:mid_spirit_jade", "count": 1 },
+  "spirit": { "item": "cultivatereg:high_spirit_jade", "count": 1 },
+  "void": { "item": "cultivatereg:top_spirit_jade", "count": 1 },
+  "integration": { "item": "cultivatereg:divine_stone_shard", "count": 1 },
+  "tribulation": { "item": "cultivatereg:divine_stone", "count": 1 },
   "core_top_chance": 0.05
 }

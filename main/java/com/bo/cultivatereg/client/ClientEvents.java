@@ -2,6 +2,7 @@ package com.bo.cultivatereg.client;
 
 import com.bo.cultivatereg.CultivateReg;
 import com.bo.cultivatereg.cultivation.CultivationCapability;
+import com.bo.cultivatereg.cultivation.CultivationData;
 import com.bo.cultivatereg.network.Net;
 import com.bo.cultivatereg.network.StartFlightPacket;
 import com.bo.cultivatereg.network.StartMeditatePacket;
@@ -94,19 +95,29 @@ public class ClientEvents {
         Minecraft mc = Minecraft.getInstance();
         if (Keybinds.MEDITATE_KEY == null) return;
 
+        CultivationData data = player.getCapability(CultivationCapability.CULTIVATION_CAP).orElse(null);
+        boolean unlocked = data != null && data.isCultivationUnlocked();
         boolean qiSightNow = Keybinds.QI_SIGHT_KEY.isDown();
         if (qiSightNow && !prevQiSight) {
-            boolean on = ClientState.toggleQiSight();
-            player.displayClientMessage(Component.literal(on ? "Qi Sight: ON" : "Qi Sight: OFF"), true);
+            if (!unlocked) {
+                player.displayClientMessage(Component.translatable("message.cultivatereg.cultivation.locked"), true);
+            } else if (data != null && !data.hasSensed()) {
+                player.displayClientMessage(Component.translatable("message.cultivatereg.cultivation.no_sense"), true);
+            } else {
+                boolean on = ClientState.toggleQiSight();
+                player.displayClientMessage(Component.literal(on ? "Qi Sight: ON" : "Qi Sight: OFF"), true);
+            }
         }
         prevQiSight = qiSightNow;
 
         boolean shieldNow = Keybinds.SHIELD_KEY.isDown();
         if (shieldNow && !prevShield) {
-            player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(d -> {
-                if (d.isShielding()) Net.CHANNEL.sendToServer(new StopShieldPacket());
+            if (!unlocked) {
+                player.displayClientMessage(Component.translatable("message.cultivatereg.cultivation.locked"), true);
+            } else if (data != null) {
+                if (data.isShielding()) Net.CHANNEL.sendToServer(new StopShieldPacket());
                 else Net.CHANNEL.sendToServer(new StartShieldPacket());
-            });
+            }
         }
         prevShield = shieldNow;
 
@@ -121,39 +132,47 @@ public class ClientEvents {
 
         boolean meditateNow = Keybinds.MEDITATE_KEY.isDown();
         if (meditateNow && !prevMeditate) {
-            player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(d -> {
-                if (d.isShielding() || d.isFlying()) {
+            if (!unlocked) {
+                player.displayClientMessage(Component.translatable("message.cultivatereg.cultivation.locked"), true);
+            } else if (data != null) {
+                if (data.isShielding() || data.isFlying()) {
                     player.displayClientMessage(Component.literal("Cannot meditate while shielding or flying."), true);
-                    return;
+                } else if (data.isMeditating()) {
+                    Net.CHANNEL.sendToServer(new StopMeditatePacket());
+                } else {
+                    Net.CHANNEL.sendToServer(new StartMeditatePacket());
                 }
-                if (d.isMeditating()) Net.CHANNEL.sendToServer(new StopMeditatePacket());
-                else Net.CHANNEL.sendToServer(new StartMeditatePacket());
-            });
+            }
         }
         prevMeditate = meditateNow;
 
         boolean restNow = Keybinds.REST_KEY.isDown();
         if (restNow && !prevRest) {
-            player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(d -> {
-                if (d.isShielding() || d.isFlying()) {
+            if (!unlocked) {
+                player.displayClientMessage(Component.translatable("message.cultivatereg.cultivation.locked"), true);
+            } else if (data != null) {
+                if (data.isShielding() || data.isFlying()) {
                     player.displayClientMessage(Component.literal("Cannot rest while shielding or flying."), true);
-                    return;
+                } else if (data.isResting()) {
+                    Net.CHANNEL.sendToServer(new StopRestPacket());
+                } else {
+                    Net.CHANNEL.sendToServer(new StartRestPacket());
                 }
-                if (d.isResting()) Net.CHANNEL.sendToServer(new StopRestPacket());
-                else Net.CHANNEL.sendToServer(new StartRestPacket());
-            });
+            }
         }
         prevRest = restNow;
 
         boolean meridiansNow = Keybinds.MERIDIANS_KEY.isDown();
         if (meridiansNow && !prevMeridians) {
-            player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(d -> {
-                if (d.isMeditating()) {
+            if (!unlocked) {
+                player.displayClientMessage(Component.translatable("message.cultivatereg.cultivation.locked"), true);
+            } else if (data != null) {
+                if (data.isMeditating()) {
                     mc.setScreen(new com.bo.cultivatereg.client.gui.MeridiansScreen());
                 } else {
                     player.displayClientMessage(Component.literal("Meditate (C) to open meridians."), true);
                 }
-            });
+            }
         }
         prevMeridians = meridiansNow;
     }

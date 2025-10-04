@@ -8,6 +8,7 @@ public class CultivationDataImpl implements CultivationData {
     private int stage = 1;                 // 1..9 for non-mortal
     private float qi = 0f;
     private boolean meditating = false;
+    private boolean cultivationUnlocked = false;
     private boolean sensed = false;
     private float senseProgress = 0f;      // ticks while meditating in MORTAL
 
@@ -24,7 +25,7 @@ public class CultivationDataImpl implements CultivationData {
     private final int[] meridianProg = new int[MERIDIANS];
 
     // Manuals
-    private ResourceLocation manualId = CultivationManuals.BASIC_QI_GATHERING.id();
+    private ResourceLocation manualId = CultivationManuals.FILTHY_BEGGAR_PRIMER.id();
     private int manualQuizProgress = 0;
     private boolean manualQuizPassed = false;
 
@@ -50,6 +51,9 @@ public class CultivationDataImpl implements CultivationData {
     // ---- Meditation / Sense ----
     @Override public boolean isMeditating() { return meditating; }
     @Override public void setMeditating(boolean v) { this.meditating = v; }
+
+    @Override public boolean isCultivationUnlocked() { return cultivationUnlocked; }
+    @Override public void setCultivationUnlocked(boolean v) { this.cultivationUnlocked = v; }
 
     @Override public boolean hasSensed() { return sensed; }
     @Override public void setSensed(boolean v) { this.sensed = v; }
@@ -81,7 +85,7 @@ public class CultivationDataImpl implements CultivationData {
     @Override public void setManualId(ResourceLocation id) {
         ResourceLocation resolved = (id != null && CultivationManuals.exists(id))
                 ? id
-                : CultivationManuals.BASIC_QI_GATHERING.id();
+                : CultivationManuals.FILTHY_BEGGAR_PRIMER.id();
         this.manualId = resolved;
     }
     @Override public int getManualQuizProgress() { return manualQuizProgress; }

@@ -1,11 +1,14 @@
 package com.bo.cultivatereg.client;
 
+import com.bo.cultivatereg.aging.PlayerAgingCapability;
+import com.bo.cultivatereg.aging.PlayerAgingData;
 import com.bo.cultivatereg.cultivation.CultivationCapability;
 import com.bo.cultivatereg.cultivation.CultivationData;
 import com.bo.cultivatereg.cultivation.Realm;
 import com.bo.cultivatereg.CultivateReg;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
@@ -19,7 +22,11 @@ public class HudOverlay {
         if (mc.player == null) return;
 
         mc.player.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(data -> {
-            int x = 8, y = 8;
+            if (!data.isCultivationUnlocked()) {
+                return;
+            }
+            int x = 8;
+            int y = 8;
             String realmLine;
             String qiLine;
             String actionLine;
@@ -49,9 +56,19 @@ public class HudOverlay {
                 }
             }
 
-            draw(g, mc, realmLine, x, y,     0xFFFFFF);
-            draw(g, mc, qiLine,    x, y+10,  0xA0FFE0);
-            draw(g, mc, actionLine,x, y+20,  0xFFD080);
+            draw(g, mc, realmLine, x, y, 0xFFFFFF);
+            y += 10;
+            draw(g, mc, qiLine, x, y, 0xA0FFE0);
+            y += 10;
+            draw(g, mc, actionLine, x, y, 0xFFD080);
+            y += 10;
+
+            mc.player.getCapability(PlayerAgingCapability.PLAYER_AGING_CAP).ifPresent(age -> {
+                String ageLine = formatAgeLine(age);
+                if (!ageLine.isEmpty()) {
+                    draw(g, mc, ageLine, x, y, 0xB0C4FF);
+                }
+            });
 
             // Spirit bar rendering remains the same
             drawSpiritBar(g, mc, data, w, h);
@@ -134,5 +151,15 @@ public class HudOverlay {
 
     private static void draw(GuiGraphics g, Minecraft mc, String s, int x, int y, int color) {
         g.drawString(mc.font, s, x, y, color, true);
+    }
+
+    private static String formatAgeLine(PlayerAgingData age) {
+        if (age == null) return "";
+        Component line = Component.translatable(
+                "age.cultivatereg.label",
+                age.getBiologicalDays(),
+                age.getAgeBracket().displayName()
+        );
+        return line.getString();
     }
 }

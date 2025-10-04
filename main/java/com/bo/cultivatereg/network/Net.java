@@ -2,6 +2,7 @@
 package com.bo.cultivatereg.network;
 
 import com.bo.cultivatereg.CultivateReg;
+import com.bo.cultivatereg.aging.PlayerAgingData;
 import com.bo.cultivatereg.cultivation.CultivationData;
 import com.bo.cultivatereg.cultivation.MobCultivationData;
 import net.minecraft.resources.ResourceLocation;
@@ -12,7 +13,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class Net {
-    private static final String PROTO = "7";
+    private static final String PROTO = "9";
     public static SimpleChannel CHANNEL;
 
     /** Call this once during common setup (you likely already do). */
@@ -56,6 +57,11 @@ public class Net {
                 SenseAttemptPacket::encode, SenseAttemptPacket::decode, SenseAttemptPacket::handle);
         CHANNEL.registerMessage(id++, BreakthroughPacket.class,
                 BreakthroughPacket::encode, BreakthroughPacket::decode, BreakthroughPacket::handle);
+        // Manual study
+        CHANNEL.registerMessage(id++, ManualQuizCompletePacket.class,
+                ManualQuizCompletePacket::encode, ManualQuizCompletePacket::decode, ManualQuizCompletePacket::handle);
+        CHANNEL.registerMessage(id++, SyncAgingPacket.class,
+                SyncAgingPacket::encode, SyncAgingPacket::decode, SyncAgingPacket::handle);
     }
 
     /** Player cultivation sync (now includes meridian mask + progress). */
@@ -73,6 +79,7 @@ public class Net {
                         data.getStage(),
                         data.getQi(),
                         data.isMeditating(),
+                        data.isCultivationUnlocked(),
                         data.hasSensed(),
                         data.getSenseProgress(),
                         data.getSpirit(),
@@ -95,6 +102,23 @@ public class Net {
                         data.hasCultivation(),
                         data.getRealm(),
                         data.getStage()
+                )
+        );
+    }
+
+    public static void syncAging(ServerPlayer sp, PlayerAgingData data) {
+        CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp),
+                new SyncAgingPacket(
+                        data.getBiologicalDays(),
+                        data.getBiologicalPartialDays(),
+                        data.getCultivationDays(),
+                        data.getCultivationPartialDays(),
+                        data.getRealm().ordinal(),
+                        data.getMaxLifespanDays(),
+                        data.getAgingMultiplier(),
+                        data.getGraceDays(),
+                        data.getAgeBracket().ordinal(),
+                        data.getLastCultivationSnapshot()
                 )
         );
     }
