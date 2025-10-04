@@ -13,6 +13,5 @@ public final class CapabilitiesInit {
     public static void registerCaps(RegisterCapabilitiesEvent e) {
         e.register(CultivationData.class);     // player cap
         e.register(MobCultivationData.class);  // mob cap
-        e.register(com.bo.cultivatereg.aging.PlayerAgingData.class);
     }
 }

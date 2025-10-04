@@ -1,7 +1,6 @@
 package com.bo.cultivatereg.network;
 
 import com.bo.cultivatereg.CultivateReg;
-import com.bo.cultivatereg.aging.PlayerAgingData;
 import com.bo.cultivatereg.cultivation.CultivationData;
 import com.bo.cultivatereg.cultivation.MobCultivationData;
 import net.minecraft.resources.ResourceLocation;
@@ -28,7 +27,6 @@ public final class Net {
         int id = 0;
         CHANNEL.registerMessage(id++, SyncCultivationPacket.class, SyncCultivationPacket::encode, SyncCultivationPacket::decode, SyncCultivationPacket::handle);
         CHANNEL.registerMessage(id++, SyncMobCultivationPacket.class, SyncMobCultivationPacket::encode, SyncMobCultivationPacket::decode, SyncMobCultivationPacket::handle);
-        CHANNEL.registerMessage(id++, SyncAgingPacket.class, SyncAgingPacket::encode, SyncAgingPacket::decode, SyncAgingPacket::handle);
         CHANNEL.registerMessage(id++, SenseAttemptPacket.class, SenseAttemptPacket::encode, SenseAttemptPacket::decode, SenseAttemptPacket::handle);
         CHANNEL.registerMessage(id++, BreakthroughPacket.class, BreakthroughPacket::encode, BreakthroughPacket::decode, BreakthroughPacket::handle);
         CHANNEL.registerMessage(id++, ManualQuizCompletePacket.class, ManualQuizCompletePacket::encode, ManualQuizCompletePacket::decode, ManualQuizCompletePacket::handle);
@@ -42,10 +40,6 @@ public final class Net {
         CHANNEL.registerMessage(id++, StopFlightPacket.class, StopFlightPacket::encode, StopFlightPacket::decode, StopFlightPacket::handle);
         CHANNEL.registerMessage(id++, StartQiSightPacket.class, StartQiSightPacket::encode, StartQiSightPacket::decode, StartQiSightPacket::handle);
         CHANNEL.registerMessage(id++, StopQiSightPacket.class, StopQiSightPacket::encode, StopQiSightPacket::decode, StopQiSightPacket::handle);
-    }
-
-    public static void syncAging(ServerPlayer player, PlayerAgingData data) {
-        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new SyncAgingPacket(data));
     }
 
     public static void sync(ServerPlayer player, CultivationData data) {

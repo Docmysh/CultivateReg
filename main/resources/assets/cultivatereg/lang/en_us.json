@@ -60,15 +60,6 @@
   "message.cultivatereg.spirit_stone.need_meditate": "You must be meditating to channel a spirit stone.",
   "message.cultivatereg.spirit_stone.overload": "Your body could not contain all the energy within the stone.",
   "effect.cultivatereg.stank": "Stank",
-  "effect.cultivatereg.gross_hands": "#$%$ on My Hand",
-  "age.cultivatereg.label": "Age: %s days (%s)",
-  "age.cultivatereg.stage.youth": "Youth",
-  "age.cultivatereg.stage.adult": "Adult",
-  "age.cultivatereg.stage.middle": "Middle Age",
-  "age.cultivatereg.stage.elder": "Elder",
-  "age.cultivatereg.stage.ancient": "Ancient",
-  "age.cultivatereg.stage.transcended": "Transcended",
-  "death.attack.cultivatereg.old_age": "%s succumbed to the weight of years.",
-  "death.attack.cultivatereg.old_age.player": "%s succumbed to the weight of years while fighting %s."
+  "effect.cultivatereg.gross_hands": "#$%$ on My Hand"
 
 }

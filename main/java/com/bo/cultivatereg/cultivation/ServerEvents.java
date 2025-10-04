@@ -1,9 +1,6 @@
 package com.bo.cultivatereg.cultivation;
 
 import com.bo.cultivatereg.CultivateReg;
-import com.bo.cultivatereg.aging.AgingProfile;
-import com.bo.cultivatereg.aging.AgingTuning;
-import com.bo.cultivatereg.aging.PlayerAgingCapability;
 import com.bo.cultivatereg.cultivation.manual.CultivationManuals;
 import com.bo.cultivatereg.network.Net;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,7 +36,6 @@ public class ServerEvents {
                     sp.setHealth(max);
                 }
             });
-            sp.getCapability(PlayerAgingCapability.PLAYER_AGING_CAP).ifPresent(age -> Net.syncAging(sp, age));
         }
     }
 
@@ -52,7 +48,6 @@ public class ServerEvents {
                 // Vanilla usually restores to max on respawn, but ensure it:
                 sp.setHealth(sp.getMaxHealth());
             });
-            sp.getCapability(PlayerAgingCapability.PLAYER_AGING_CAP).ifPresent(age -> Net.syncAging(sp, age));
         }
     }
 
@@ -64,7 +59,6 @@ public class ServerEvents {
                 // Optional: re-apply so max health reflects realm immediately after TP
                 CultivationAttributes.apply(sp, d);
             });
-            sp.getCapability(PlayerAgingCapability.PLAYER_AGING_CAP).ifPresent(age -> Net.syncAging(sp, age));
         }
     }
 
@@ -75,7 +69,6 @@ public class ServerEvents {
         Player p = e.player;
 
         p.getCapability(CultivationCapability.CULTIVATION_CAP).ifPresent(data -> {
-            Realm prevRealm = data.getRealm();
             boolean dirty = false, bigChange = false;
             boolean oncePerSecond = (p.level().getGameTime() % 20L) == 0L;
 
@@ -197,21 +190,7 @@ public class ServerEvents {
 
             if (p instanceof ServerPlayer sp) {
                 if (bigChange || (dirty && oncePerSecond)) Net.sync(sp, data);
-                if (data.getRealm() != prevRealm) {
-                    applyRealmAgingSync(sp, data.getRealm());
-                }
             }
-        });
-    }
-
-    private static void applyRealmAgingSync(ServerPlayer sp, Realm realm) {
-        sp.getCapability(PlayerAgingCapability.PLAYER_AGING_CAP).ifPresent(age -> {
-            AgingProfile profile = AgingTuning.profileForRealm(realm);
-            age.setRealm(realm);
-            age.setMaxLifespanDays(profile.maxLifespanDays());
-            age.setAgingMultiplier(profile.agingMultiplier());
-            age.setGraceDays(AgingTuning.graceDays());
-            Net.syncAging(sp, age);
         });
     }
 

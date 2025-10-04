@@ -1,14 +1,11 @@
 package com.bo.cultivatereg.client;
 
-import com.bo.cultivatereg.aging.PlayerAgingCapability;
-import com.bo.cultivatereg.aging.PlayerAgingData;
 import com.bo.cultivatereg.cultivation.CultivationCapability;
 import com.bo.cultivatereg.cultivation.CultivationData;
 import com.bo.cultivatereg.cultivation.Realm;
 import com.bo.cultivatereg.CultivateReg;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
@@ -62,13 +59,6 @@ public class HudOverlay {
             y += 10;
             draw(g, mc, actionLine, x, y, 0xFFD080);
             y += 10;
-
-            mc.player.getCapability(PlayerAgingCapability.PLAYER_AGING_CAP).ifPresent(age -> {
-                String ageLine = formatAgeLine(age);
-                if (!ageLine.isEmpty()) {
-                    draw(g, mc, ageLine, x, y, 0xB0C4FF);
-                }
-            });
 
             // Spirit bar rendering remains the same
             drawSpiritBar(g, mc, data, w, h);
@@ -153,13 +143,4 @@ public class HudOverlay {
         g.drawString(mc.font, s, x, y, color, true);
     }
 
-    private static String formatAgeLine(PlayerAgingData age) {
-        if (age == null) return "";
-        Component line = Component.translatable(
-                "age.cultivatereg.label",
-                age.getBiologicalDays(),
-                age.getAgeBracket().displayName()
-        );
-        return line.getString();
-    }
 }
