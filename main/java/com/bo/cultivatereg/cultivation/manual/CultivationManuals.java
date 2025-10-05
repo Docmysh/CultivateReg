@@ -112,6 +112,94 @@ public final class CultivationManuals {
             )
     );
 
+    public static final CultivationManual SALTCHEMIST_TIER_I = register(
+            new CultivationManual(
+                    ResourceLocation.fromNamespaceAndPath(CultivateReg.MODID, "manual/saltchemist_tier_i"),
+                    "Saltchemist Manual – Tier I",
+                    "Introduces the Doctrine of Universal Union and teaches how to refine Virtuous Salts " +
+                            "to carry a cultivator from Qi Gathering through Core Formation.",
+                    """
+                    Foundational Principle
+
+                    The Saltchemist follows the Doctrine of Universal Union: that all substances, from the smallest grain of salt
+                    to the flesh of the cultivator, are bound by hidden laws. By imbibing the Root Panacea, an ancient elixir
+                    older than dynasties, the cultivator transmutes their body into a living crucible. Every breath becomes
+                    distillation, every heartbeat a reaction.
+
+                    Through this transformation, one gains dominion over Virtuous Salts—primordial catalysts that can bend
+                    essence itself. These salts, when refined, can exalt allies with boons or corrode foes with ruin. Unlike other
+                    paths, the Saltchemist requires sharpness of Mind and Intellect, for without understanding of balance,
+                    reaction, and measure, the crucible body implodes under its own experiments.
+
+                    Tier I – Crucible Awakening
+
+                    Draw Qi into the Root Panacea to separate the Seven Base Salts. Circulate each salt through the limbs while
+                    holding the dantian steady, then dissolve it back into the abdomen to temper marrow and meridians. Repeat the
+                    cycle until the Virtuous Salts answer your will. As the crucible body stabilises, condense the salts into a
+                    crystalline core within the dantian, fusing Foundation and Core Formation into a single, seamless reaction.
+                    """,
+                    "To advance, distil three batches of Seven Base Salts without impurity, then submerge the Heart Meridian in
+                    brine until the Virtuous Salts resonate with your core.",
+                    Realm.QI_GATHERING,
+                    Realm.CORE_FORMATION,
+                    9,
+                    List.of()
+            )
+    );
+
+    public static final CultivationManual SALTCHEMIST_TIER_II = register(
+            new CultivationManual(
+                    ResourceLocation.fromNamespaceAndPath(CultivateReg.MODID, "manual/saltchemist_tier_ii"),
+                    "Saltchemist Manual – Tier II",
+                    "Expands the crucible body, teaching how to marshal Virtuous Salts to shepherd a Nascent Soul toward Void"
+                            + " Refining.",
+                    """
+                    Tier II – Sublimation of the Nascent Crucible
+
+                    With the core condensed, vent its vapours into the soul. Separate the Virtuous Salts into three arrays: the
+                    Tempering Array to protect the nascent infant, the Exalting Array to feed allies and formations, and the
+                    Corrosive Array to scour enemies. Alternate the arrays through the meridians so that no reaction stagnates,
+                    then compress them into liquid halos around the soul.
+
+                    As the halos spin, fold them back into the void within the dantian. Let the Nascent Soul steep within the
+                    tri-fold crucible until it learns to exhale salt-mist on its own. When the mist no longer dissipates, the body
+                    is prepared to leap from Soul Transformation into Void Refining without fracture.
+                    """,
+                    "Balance the Tempering, Exalting, and Corrosive arrays for nine cycles while sustaining an ally with their
+                    boons; only then will the Virtuous Salts crystallise enough to breach the void.",
+                    Realm.NASCENT_SOUL,
+                    Realm.VOID_REFINING,
+                    9,
+                    List.of()
+            )
+    );
+
+    public static final CultivationManual SALTCHEMIST_TIER_III = register(
+            new CultivationManual(
+                    ResourceLocation.fromNamespaceAndPath(CultivateReg.MODID, "manual/saltchemist_tier_iii"),
+                    "Saltchemist Manual – Tier III",
+                    "Finalises the Saltchemist path by guiding the crucible body from Void Refining through Tribulation, uniting"
+                            + " mortal flesh with cosmic salts.",
+                    """
+                    Tier III – Universal Union
+
+                    Project the Virtuous Salts beyond the body until they anchor to the stars. Harvest celestial frost, oceanic
+                    brine, and volcanic ash to create the Triune Panacea, then dissolve the crucible body within it. Allow every
+                    breath to alternate between drawing cosmic salts inward and exhaling mortal impurities outward.
+
+                    When the Triune Panacea balances perfectly, call down heaven's lightning and let it strike the crucible body.
+                    Each bolt should be caught, distilled, and stored as a final Virtuous Salt. Once nine bolts are sealed, ignite
+                    them all at once and step through the storm. The body that emerges will no longer fear Tribulation.
+                    """,
+                    "Offer the Triune Panacea to the heavens and endure nine lightning strikes without shattering the crucible
+                    body; only then may the Saltchemist tread Integration and stand unbowed before Tribulation.",
+                    Realm.VOID_REFINING,
+                    Realm.TRIBULATION,
+                    9,
+                    List.of()
+            )
+    );
+
     private CultivationManuals() {
     }
 
