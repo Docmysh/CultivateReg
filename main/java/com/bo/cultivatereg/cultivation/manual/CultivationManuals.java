@@ -138,8 +138,8 @@ public final class CultivationManuals {
                     cycle until the Virtuous Salts answer your will. As the crucible body stabilises, condense the salts into a
                     crystalline core within the dantian, fusing Foundation and Core Formation into a single, seamless reaction.
                     """,
-                    "To advance, distil three batches of Seven Base Salts without impurity, then submerge the Heart Meridian in
-                    brine until the Virtuous Salts resonate with your core.",
+                    "To advance, distil three batches of Seven Base Salts without impurity, then submerge the Heart Meridian in " +
+                            "brine until the Virtuous Salts resonate with your core.",
                     Realm.QI_GATHERING,
                     Realm.CORE_FORMATION,
                     9,
@@ -165,8 +165,8 @@ public final class CultivationManuals {
                     tri-fold crucible until it learns to exhale salt-mist on its own. When the mist no longer dissipates, the body
                     is prepared to leap from Soul Transformation into Void Refining without fracture.
                     """,
-                    "Balance the Tempering, Exalting, and Corrosive arrays for nine cycles while sustaining an ally with their
-                    boons; only then will the Virtuous Salts crystallise enough to breach the void.",
+                    "Balance the Tempering, Exalting, and Corrosive arrays for nine cycles while sustaining an ally with their " +
+                            "boons; only then will the Virtuous Salts crystallise enough to breach the void.",
                     Realm.NASCENT_SOUL,
                     Realm.VOID_REFINING,
                     9,
@@ -191,8 +191,8 @@ public final class CultivationManuals {
                     Each bolt should be caught, distilled, and stored as a final Virtuous Salt. Once nine bolts are sealed, ignite
                     them all at once and step through the storm. The body that emerges will no longer fear Tribulation.
                     """,
-                    "Offer the Triune Panacea to the heavens and endure nine lightning strikes without shattering the crucible
-                    body; only then may the Saltchemist tread Integration and stand unbowed before Tribulation.",
+                    "Offer the Triune Panacea to the heavens and endure nine lightning strikes without shattering the crucible " +
+                            "body; only then may the Saltchemist tread Integration and stand unbowed before Tribulation.",
                     Realm.VOID_REFINING,
                     Realm.TRIBULATION,
                     9,
